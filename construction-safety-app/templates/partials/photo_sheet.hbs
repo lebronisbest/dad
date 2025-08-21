@@ -1,0 +1,22 @@
+<div class="form-section photo-section">
+    <h3>📸 현장 사진</h3>
+    <div class="photo-grid avoid-break">
+        {{#each photos}}
+        <div class="photo-item">
+            <div class="photo-container">
+                <img src="{{photoUrl}}" alt="{{description}}" class="photo-image" />
+                <div class="photo-overlay">
+                    <span class="photo-number">{{@index}}</span>
+                </div>
+            </div>
+            <div class="photo-info">
+                <div class="photo-description">{{description}}</div>
+                <div class="photo-meta">
+                    <span class="photo-date">{{dateFmt takenDate "YYYY-MM-DD"}}</span>
+                    <span class="photo-location">{{location}}</span>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</div>

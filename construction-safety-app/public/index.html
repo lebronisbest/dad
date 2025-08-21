@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>건설재해예방전문지도기관 기술지도 결과보고서</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🏗️ 건설재해예방전문지도기관</h1>
+            <h2>기술지도 결과보고서 생성 시스템</h2>
+        </header>
+
+        <main class="main-content">
+            <div class="form-container">
+                <form id="reportForm" class="report-form">
+                    <div class="form-section">
+                        <h3>📋 기본 정보</h3>
+                        <div class="form-group">
+                            <label for="templateId">보고서 템플릿</label>
+                            <select id="templateId" name="templateId" required>
+                                <option value="">템플릿을 선택하세요</option>
+                                <option value="template1">기본 기술지도 결과보고서</option>
+                                <option value="template2">상세 기술지도 결과보고서</option>
+                                <option value="template3">긴급 기술지도 결과보고서</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>🏢 프로젝트 정보</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="projectName">프로젝트명 *</label>
+                                <input type="text" id="projectName" name="projectName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="projectLocation">프로젝트 위치 *</label>
+                                <input type="text" id="projectLocation" name="projectLocation" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="projectType">프로젝트 유형</label>
+                                <select id="projectType" name="projectType">
+                                    <option value="">선택하세요</option>
+                                    <option value="주거시설">주거시설</option>
+                                    <option value="상업시설">상업시설</option>
+                                    <option value="공업시설">공업시설</option>
+                                    <option value="교통시설">교통시설</option>
+                                    <option value="토목시설">토목시설</option>
+                                    <option value="환경시설">환경시설</option>
+                                    <option value="기타">기타</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="contractor">시공사</label>
+                                <input type="text" id="contractor" name="contractor">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>👷 기술지도 정보</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="guidanceDate">지도일</label>
+                                <input type="date" id="guidanceDate" name="guidanceDate">
+                            </div>
+                            <div class="form-group">
+                                <label for="guidanceType">지도유형</label>
+                                <select id="guidanceType" name="guidanceType">
+                                    <option value="">선택하세요</option>
+                                    <option value="정기점검">정기점검</option>
+                                    <option value="수시점검">수시점검</option>
+                                    <option value="긴급점검">긴급점검</option>
+                                    <option value="사고조사">사고조사</option>
+                                    <option value="안전교육">안전교육</option>
+                                    <option value="기타">기타</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="inspector">지도자 *</label>
+                                <input type="text" id="inspector" name="inspector" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="guidanceDuration">지도시간</label>
+                                <input type="text" id="guidanceDuration" name="guidanceDuration" placeholder="예: 2시간">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>🔍 발견사항</h3>
+                        <div id="findingsContainer">
+                            <div class="finding-item">
+                                <input type="text" name="findings[]" placeholder="발견사항을 입력하세요">
+                                <button type="button" class="remove-btn" onclick="removeFinding(this)">삭제</button>
+                            </div>
+                        </div>
+                        <button type="button" class="add-btn" onclick="addFinding()">+ 발견사항 추가</button>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>💡 권고사항</h3>
+                        <div id="recommendationsContainer">
+                            <div class="recommendation-item">
+                                <input type="text" name="recommendations[]" placeholder="권고사항을 입력하세요">
+                                <button type="button" class="remove-btn" onclick="removeRecommendation(this)">삭제</button>
+                            </div>
+                        </div>
+                        <button type="button" class="add-btn" onclick="addRecommendation()">+ 권고사항 추가</button>
+                    </div>
+
+                    <div class="form-section" id="detailedSection" style="display: none;">
+                        <h3>📊 상세 정보 (상세보고서용)</h3>
+                        <div class="form-group">
+                            <label for="responsiblePerson">책임자</label>
+                            <input type="text" id="responsiblePerson" name="responsiblePerson">
+                        </div>
+                    </div>
+
+                    <div class="form-section" id="emergencySection" style="display: none;">
+                        <h3>🚨 긴급 조치사항 (긴급보고서용)</h3>
+                        <div class="form-group">
+                            <label for="emergencyLevel">긴급도</label>
+                            <select id="emergencyLevel" name="emergencyLevel">
+                                <option value="높음">높음</option>
+                                <option value="중간">중간</option>
+                                <option value="낮음">낮음</option>
+                            </select>
+                        </div>
+                        <div id="immediateActionsContainer">
+                            <div class="action-item">
+                                <input type="text" name="immediateActions[]" placeholder="즉시조치사항을 입력하세요">
+                                <button type="button" class="remove-btn" onclick="removeAction(this)">삭제</button>
+                            </div>
+                        </div>
+                        <button type="button" class="add-btn" onclick="addImmediateAction()">+ 즉시조치사항 추가</button>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">📄 보고서 생성</button>
+                        <button type="button" class="btn btn-secondary" onclick="resetForm()">🔄 초기화</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="result-container" id="resultContainer" style="display: none;">
+                <h3>📋 생성된 보고서</h3>
+                <div id="reportResult"></div>
+                <div class="download-actions">
+                    <button type="button" class="btn btn-success" onclick="downloadPDF()">📥 PDF 다운로드</button>
+                    <button type="button" class="btn btn-info" onclick="downloadExcel()">📊 Excel 다운로드</button>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; 2024 건설재해예방전문지도기관. 모든 권리 보유.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

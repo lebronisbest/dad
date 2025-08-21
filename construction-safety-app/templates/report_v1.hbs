@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{projectName}} - 기술지도 결과보고서</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles/print.css">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        {{> header}}
+        
+        <main class="main-content">
+            {{> overview}}
+            
+            {{> risk_table}}
+            
+            {{> photo_sheet}}
+            
+            <div class="form-section">
+                <h3>🔍 발견사항</h3>
+                <div class="findings-list">
+                    {{#each findings}}
+                    <div class="finding-item">
+                        <span class="finding-number">{{@index}}</span>
+                        <span class="finding-text">{{this}}</span>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>💡 권고사항</h3>
+                <div class="recommendations-list">
+                    {{#each recommendations}}
+                    <div class="recommendation-item">
+                        <span class="recommendation-number">{{@index}}</span>
+                        <span class="recommendation-text">{{this}}</span>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+
+            {{#if isDetailedReport}}
+            <div class="form-section">
+                <h3>📊 상세 정보</h3>
+                <div class="form-group">
+                    <label>책임자</label>
+                    <span>{{responsiblePerson}}</span>
+                </div>
+            </div>
+            {{/if}}
+
+            {{#if isEmergencyReport}}
+            <div class="form-section">
+                <h3>🚨 긴급 조치사항</h3>
+                <div class="form-group">
+                    <label>긴급도</label>
+                    <span class="emergency-level {{emergencyLevel}}">{{emergencyLevel}}</span>
+                </div>
+                <div class="immediate-actions-list">
+                    {{#each immediateActions}}
+                    <div class="action-item">
+                        <span class="action-number">{{@index}}</span>
+                        <span class="action-text">{{this}}</span>
+                    </div>
+                    {{/each}}
+                </div>
+            </div>
+            {{/if}}
+
+            <div class="signature-section">
+                <div class="signature-row">
+                    <div class="signature-item">
+                        <label>지도자</label>
+                        <div class="signature-box">{{inspector}}</div>
+                        <span class="signature-date">{{dateFmt guidanceDate "YYYY-MM-DD"}}</span>
+                    </div>
+                    <div class="signature-item">
+                        <label>검토자</label>
+                        <div class="signature-box">{{reviewer}}</div>
+                        <span class="signature-date">{{dateFmt reviewDate "YYYY-MM-DD"}}</span>
+                    </div>
+                    <div class="signature-item">
+                        <label>승인자</label>
+                        <div class="signature-box">{{approver}}</div>
+                        <span class="signature-date">{{dateFmt approvalDate "YYYY-MM-DD"}}</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>&copy; {{currentYear}} 건설재해예방전문지도기관. 모든 권리 보유.</p>
+            <p>보고서 생성일시: {{dateFmt createdAt "YYYY-MM-DD HH:mm"}}</p>
+        </footer>
+    </div>
+</body>
+</html>

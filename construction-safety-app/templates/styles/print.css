@@ -1,0 +1,242 @@
+/* 인쇄 품질 CSS 공통화 */
+@page {
+    size: A4;
+    margin: 2cm;
+}
+
+@media print {
+    * {
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+    
+    body {
+        font-size: 12pt;
+        line-height: 1.4;
+        color: #000;
+        background: white;
+    }
+    
+    .container {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .header {
+        page-break-after: avoid;
+        border-bottom: 2px solid #333;
+        margin-bottom: 20px;
+    }
+    
+    .form-section {
+        page-break-inside: avoid;
+        margin-bottom: 20px;
+    }
+    
+    .avoid-break {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+    
+    .risk-table-container {
+        page-break-inside: avoid;
+    }
+    
+    .photo-grid {
+        page-break-inside: avoid;
+    }
+    
+    .signature-section {
+        page-break-before: auto;
+        page-break-inside: avoid;
+        margin-top: 30px;
+    }
+    
+    .photo-item {
+        page-break-inside: avoid;
+        margin-bottom: 15px;
+    }
+    
+    .photo-image {
+        max-width: 100%;
+        height: auto;
+        border: 1px solid #ddd;
+    }
+    
+    .risk-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10pt;
+    }
+    
+    .risk-table th,
+    .risk-table td {
+        border: 1px solid #333;
+        padding: 8px;
+        text-align: center;
+    }
+    
+    .risk-table th {
+        background-color: #f5f5f5;
+        font-weight: bold;
+    }
+    
+    .overview-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    
+    .overview-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .overview-item label {
+        font-weight: bold;
+        min-width: 100px;
+    }
+    
+    .findings-list,
+    .recommendations-list {
+        margin: 15px 0;
+    }
+    
+    .finding-item,
+    .recommendation-item {
+        display: flex;
+        margin-bottom: 10px;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    .finding-number,
+    .recommendation-number {
+        background-color: #007bff;
+        color: white;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: bold;
+        margin-right: 10px;
+        flex-shrink: 0;
+    }
+    
+    .signature-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+    }
+    
+    .signature-item {
+        text-align: center;
+        flex: 1;
+        margin: 0 10px;
+    }
+    
+    .signature-box {
+        border: 2px solid #333;
+        height: 60px;
+        margin: 10px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    
+    .signature-date {
+        font-size: 10pt;
+        color: #666;
+    }
+    
+    .emergency-level {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-weight: bold;
+        color: white;
+    }
+    
+    .emergency-level.높음 {
+        background-color: #dc3545;
+    }
+    
+    .emergency-level.중간 {
+        background-color: #ffc107;
+        color: #333;
+    }
+    
+    .emergency-level.낮음 {
+        background-color: #28a745;
+    }
+    
+    .risk-level.높음 .risk-badge {
+        background-color: #dc3545;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 9pt;
+    }
+    
+    .risk-level.중간 .risk-badge {
+        background-color: #ffc107;
+        color: #333;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 9pt;
+    }
+    
+    .risk-level.낮음 .risk-badge {
+        background-color: #28a745;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 3px;
+        font-size: 9pt;
+    }
+    
+    .completed {
+        color: #28a745;
+        font-weight: bold;
+    }
+    
+    .pending {
+        color: #ffc107;
+        font-weight: bold;
+    }
+    
+    .footer {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 1px solid #ddd;
+        text-align: center;
+        font-size: 10pt;
+        color: #666;
+    }
+    
+    /* 페이지 번호 */
+    @page {
+        @bottom-center {
+            content: counter(page);
+            font-size: 10pt;
+        }
+    }
+    
+    /* 폰트 폴백 */
+    body {
+        font-family: 'Noto Sans KR', 'Malgun Gothic', 'Dotum', sans-serif;
+    }
+    
+    /* 워드 브레이크 */
+    .project-name,
+    .photo-description {
+        word-break: keep-all;
+        overflow-wrap: break-word;
+    }
+}

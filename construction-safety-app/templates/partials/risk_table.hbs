@@ -1,0 +1,35 @@
+<div class="form-section risk-assessment-section">
+    <h3>⚠️ 위험도 평가</h3>
+    <div class="risk-table-container avoid-break">
+        <table class="risk-table">
+            <thead>
+                <tr>
+                    <th>순번</th>
+                    <th>위험요소</th>
+                    <th>위험도</th>
+                    <th>조치사항</th>
+                    <th>완료여부</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each riskAssessments}}
+                <tr>
+                    <td class="risk-number">{{@index}}</td>
+                    <td class="risk-element">{{riskElement}}</td>
+                    <td class="risk-level {{riskLevel}}">
+                        <span class="risk-badge">{{riskLevel}}</span>
+                    </td>
+                    <td class="risk-action">{{action}}</td>
+                    <td class="risk-completion">
+                        {{#if isCompleted}}
+                        <span class="completed">✓ 완료</span>
+                        {{else}}
+                        <span class="pending">○ 진행중</span>
+                        {{/if}}
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
