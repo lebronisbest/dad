@@ -62,6 +62,67 @@ const tools = [
     }
   },
   {
+    name: 'create_safety_report',
+    description: '새로운 기술지도 결과보고서를 생성합니다. 유효성 검사 실패 시 필드별 가이드를 제공합니다.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        report: {
+          type: 'object',
+          description: '보고서 데이터'
+        }
+      },
+      required: ['report']
+    }
+  },
+  {
+    name: 'get_report_templates',
+    description: '현재 3종 + 커스텀 템플릿 메타데이터를 반환합니다.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        includeCustom: {
+          type: 'boolean',
+          description: '커스텀 템플릿 포함 여부',
+          default: true
+        }
+      }
+    }
+  },
+  {
+    name: 'get_legal_refs',
+    description: '캐시된 조문/가이드라인 스니펫을 반환합니다.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        keyword: {
+          type: 'string',
+          description: '검색 키워드'
+        },
+        lawType: {
+          type: 'string',
+          enum: ['산업안전보건법', '시행령', '시행규칙', '고시'],
+          description: '법령 유형'
+        }
+      },
+      required: ['keyword']
+    }
+  },
+  {
+    name: 'validate_report_data',
+    description: '입력값과 법규 기준 상충 포인트를 간단 리포트로 제공합니다.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        payload: {
+          type: 'object',
+          description: '검증할 보고서 데이터'
+        }
+      },
+      required: ['payload']
+    }
+  },
+  {
     name: 'law_search',
     description: '국가법령정보 API를 통해 건설안전 관련 법령을 검색합니다.',
     inputSchema: {
@@ -284,6 +345,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case 'sample_report_skeleton':
         return await handleSampleReportSkeleton(args);
       
+      case 'create_safety_report':
+        return await handleCreateSafetyReport(args);
+      
+      case 'get_report_templates':
+        return await handleGetReportTemplates(args);
+      
+      case 'get_legal_refs':
+        return await handleGetLegalRefs(args);
+      
+      case 'validate_report_data':
+        return await handleValidateReportData(args);
+      
       case 'law_search':
         return await handleLawSearch(args);
       
@@ -418,6 +491,308 @@ async function handleLawSearch(args) {
         {
           type: 'text',
           text: `법령 검색 중 오류 발생: ${error.message}\n\n상세 오류: ${error.stack || '스택 정보 없음'}`
+        }
+      ],
+      isError: true
+    };
+  }
+}
+
+// 새로운 도구 핸들러들
+
+// 안전 보고서 생성
+async function handleCreateSafetyReport(args) {
+  const { report } = args;
+  
+  if (!report) {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: '오류: 보고서 데이터가 필요합니다.'
+        }
+      ],
+      isError: true
+    };
+  }
+  
+  try {
+    const { default: fetch } = await import('node-fetch');
+    const apiUrl = `${config.apiBaseUrl}/api/report/generate`;
+    
+    const response = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(report)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `보고서 생성 실패: ${errorData.message}\n\n유효성 검사 오류:\n${JSON.stringify(errorData.errors, null, 2)}`
+          }
+        ],
+        isError: true
+      };
+    }
+    
+    const data = await response.json();
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `보고서가 성공적으로 생성되었습니다:\n\n${JSON.stringify(data, null, 2)}`
+        }
+      ]
+    };
+  } catch (error) {
+    console.error('보고서 생성 중 오류 발생:', error);
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `보고서 생성 중 오류 발생: ${error.message}`
+        }
+      ],
+      isError: true
+    };
+  }
+}
+
+// 보고서 템플릿 조회
+async function handleGetReportTemplates(args) {
+  const { includeCustom = true } = args;
+  
+  try {
+    const templates = [
+      {
+        id: 'template1',
+        name: '일반 기술지도 결과보고서',
+        description: '기본적인 기술지도 결과를 기록하는 표준 템플릿',
+        fields: ['projectName', 'projectLocation', 'contractor', 'inspectionDate', 'inspector', 'findings', 'recommendations'],
+        required: ['projectName', 'projectLocation', 'contractor', 'inspectionDate', 'inspector', 'findings', 'recommendations']
+      },
+      {
+        id: 'template2',
+        name: '특별기술지도 결과보고서',
+        description: '사고 발생, 중대재해 위험 등 특별한 상황에 대한 보고서',
+        fields: ['projectName', 'projectLocation', 'contractor', 'inspectionDate', 'inspector', 'specialInspectionType', 'accidentDetails', 'findings', 'recommendations', 'emergencyMeasures'],
+        required: ['projectName', 'projectLocation', 'contractor', 'inspectionDate', 'inspector', 'specialInspectionType', 'findings', 'recommendations']
+      },
+      {
+        id: 'template3',
+        name: '정기기술지도 결과보고서',
+        description: '정기적인 점검 결과를 체계적으로 기록하는 보고서',
+        fields: ['projectName', 'projectLocation', 'contractor', 'inspectionPeriod', 'inspectionScope', 'findings', 'recommendations', 'complianceStatus', 'nextInspectionDate'],
+        required: ['projectName', 'projectLocation', 'contractor', 'inspectionPeriod', 'inspectionScope', 'findings', 'recommendations', 'complianceStatus']
+      }
+    ];
+    
+    if (includeCustom) {
+      // 커스텀 템플릿 로직 (향후 구현)
+      templates.push({
+        id: 'custom',
+        name: '커스텀 템플릿',
+        description: '사용자 정의 템플릿',
+        fields: ['*'],
+        required: ['projectName', 'projectLocation', 'contractor', 'inspectionDate', 'inspector']
+      });
+    }
+    
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `사용 가능한 템플릿:\n\n${JSON.stringify(templates, null, 2)}`
+        }
+      ]
+    };
+  } catch (error) {
+    console.error('템플릿 조회 중 오류 발생:', error);
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `템플릿 조회 중 오류 발생: ${error.message}`
+        }
+      ],
+      isError: true
+    };
+  }
+}
+
+// 법령 참조 조회
+async function handleGetLegalRefs(args) {
+  const { keyword, lawType } = args;
+  
+  if (!keyword) {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: '오류: 검색 키워드가 필요합니다.'
+        }
+      ],
+      isError: true
+    };
+  }
+  
+  try {
+    // 캐시된 법령 정보 (실제로는 데이터베이스나 파일에서 로드)
+    const legalRefs = {
+      '안전모': [
+        {
+          law: '산업안전보건법',
+          article: '제43조',
+          content: '사업주는 근로자에게 안전모 등 보호구를 지급하고 착용하게 하여야 한다.',
+          reference: 'https://www.law.go.kr/법령/산업안전보건법/제43조'
+        }
+      ],
+      '안전띠': [
+        {
+          law: '산업안전보건법',
+          article: '제43조',
+          content: '고소작업 시 안전띠 착용 의무',
+          reference: 'https://www.law.go.kr/법령/산업안전보건법/제43조'
+        }
+      ],
+      '고소작업': [
+        {
+          law: '산업안전보건법',
+          article: '제44조',
+          content: '고소작업 시 안전조치 의무',
+          reference: 'https://www.law.go.kr/법령/산업안전보건법/제44조'
+        }
+      ]
+    };
+    
+    const results = legalRefs[keyword] || [];
+    
+    if (results.length === 0) {
+      return {
+        content: [
+          {
+            type: 'text',
+            text: `'${keyword}'에 대한 법령 참조를 찾을 수 없습니다.`
+          }
+        ]
+      };
+    }
+    
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `'${keyword}' 관련 법령 참조:\n\n${JSON.stringify(results, null, 2)}`
+        }
+      ]
+    };
+  } catch (error) {
+    console.error('법령 참조 조회 중 오류 발생:', error);
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `법령 참조 조회 중 오류 발생: ${error.message}`
+        }
+      ],
+      isError: true
+    };
+  }
+}
+
+// 보고서 데이터 검증
+async function handleValidateReportData(args) {
+  const { payload } = args;
+  
+  if (!payload) {
+    return {
+      content: [
+        {
+          type: 'text',
+          text: '오류: 검증할 데이터가 필요합니다.'
+        }
+      ],
+      isError: true
+    };
+  }
+  
+  try {
+    // 기본 유효성 검사
+    const errors = [];
+    const warnings = [];
+    
+    // 필수 필드 검사
+    const requiredFields = ['projectName', 'projectLocation', 'contractor', 'inspectionDate', 'inspector'];
+    requiredFields.forEach(field => {
+      if (!payload[field]) {
+        errors.push(`필수 필드 누락: ${field}`);
+      }
+    });
+    
+    // 발견사항 검사
+    if (!payload.findings || payload.findings.length === 0) {
+      errors.push('최소 1개 이상의 발견사항이 필요합니다');
+    } else if (payload.findings.length < 2) {
+      warnings.push('발견사항이 2개 미만입니다. 더 자세한 점검이 권장됩니다.');
+    }
+    
+    // 권고사항 검사
+    if (!payload.recommendations || payload.recommendations.length === 0) {
+      errors.push('최소 1개 이상의 권고사항이 필요합니다');
+    }
+    
+    // 날짜 형식 검사
+    if (payload.inspectionDate && !/^\d{4}-\d{2}-\d{2}$/.test(payload.inspectionDate)) {
+      errors.push('점검일자 형식이 올바르지 않습니다 (YYYY-MM-DD)');
+    }
+    
+    // 법규 준수성 검사
+    if (payload.findings) {
+      payload.findings.forEach((finding, index) => {
+        if (finding.severity === '높음' && !finding.lawReference) {
+          warnings.push(`발견사항 ${index + 1}: 높은 위험도인데 법적 근거가 없습니다`);
+        }
+      });
+    }
+    
+    const result = {
+      isValid: errors.length === 0,
+      errors,
+      warnings,
+      recommendations: []
+    };
+    
+    if (errors.length > 0) {
+      result.recommendations.push('필수 필드를 모두 입력하세요');
+      result.recommendations.push('발견사항과 권고사항을 최소 1개 이상 작성하세요');
+    }
+    
+    if (warnings.length > 0) {
+      result.recommendations.push('법적 근거를 명시하여 보고서의 신뢰성을 높이세요');
+      result.recommendations.push('더 자세한 점검을 통해 포괄적인 안전관리를 하세요');
+    }
+    
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `데이터 검증 결과:\n\n${JSON.stringify(result, null, 2)}`
+        }
+      ]
+    };
+  } catch (error) {
+    console.error('데이터 검증 중 오류 발생:', error);
+    return {
+      content: [
+        {
+          type: 'text',
+          text: `데이터 검증 중 오류 발생: ${error.message}`
         }
       ],
       isError: true

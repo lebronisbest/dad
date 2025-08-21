@@ -1,5 +1,8 @@
 const { z } = require('zod');
 
+// 공통 스키마 import (향후 워크스페이스 설정 후)
+// const { ReportSchema, validateReport } = require('@construction-safety/shared');
+
 // 법정 참조 스키마
 const LegalReferenceSchema = z.union([
   z.string().regex(/^산안법\s*§\s*\d+/, '산안법 형식이 올바르지 않습니다'),
@@ -231,6 +234,28 @@ function validateReportPatch(data) {
   }
 }
 
+// 새로운 공통 스키마 검증 함수 (향후 사용)
+function validateReportDataV2(data) {
+  try {
+    // 공통 스키마 사용 (워크스페이스 설정 후)
+    // const result = ReportSchema.parse(data);
+    // return { isValid: true, data: result, errors: null };
+    
+    // 임시로 기존 검증 사용
+    return validateReportData(data);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errors = error.errors.map(err => ({
+        field: err.path.join('.'),
+        message: err.message,
+        code: err.code,
+      }));
+      return { isValid: false, data: null, errors };
+    }
+    return { isValid: false, data: null, errors: [{ field: 'unknown', message: error.message }] };
+  }
+}
+
 // 에러 메시지 한글화
 function getKoreanErrorMessage(field, code) {
   const errorMessages = {
@@ -266,6 +291,7 @@ function getKoreanErrorMessage(field, code) {
 
 module.exports = {
   validateReportData,
+  validateReportDataV2,
   validateReportPatch,
   getKoreanErrorMessage,
   ReportSchema,

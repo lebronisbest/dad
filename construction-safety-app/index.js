@@ -7,7 +7,9 @@ const { generateReport } = require('./services/reportGenerator');
 const { validateReportData } = require('./services/validator');
 const TemplateEngine = require('./services/templateEngine');
 const PDFGenerator = require('./services/pdfGenerator');
+const PDFGeneratorV2 = require('./services/pdfGeneratorV2');
 const DOCXGenerator = require('./services/docxGenerator');
+const ExcelGenerator = require('./services/excelGenerator');
 const ImageProcessor = require('./services/imageProcessor');
 
 const app = express();
@@ -20,7 +22,9 @@ const EXPORT_PROFILE = process.env.EXPORT_PROFILE || 'fast';
 // 서비스 인스턴스 생성
 const templateEngine = new TemplateEngine();
 const pdfGenerator = new PDFGenerator();
+const pdfGeneratorV2 = new PDFGeneratorV2();
 const docxGenerator = new DOCXGenerator();
+const excelGenerator = new ExcelGenerator();
 const imageProcessor = new ImageProcessor();
 
 // 미들웨어 설정
@@ -120,7 +124,7 @@ app.post('/api/report/generate', async (req, res) => {
   }
 });
 
-// PDF 내보내기 API
+// PDF 내보내기 API (기존 Puppeteer)
 app.post('/api/export/pdf', async (req, res) => {
   try {
     const { templateName = 'report_v1', data, quality = 'standard' } = req.body;
@@ -151,6 +155,45 @@ app.post('/api/export/pdf', async (req, res) => {
     res.send(pdfBuffer);
   } catch (error) {
     console.error('PDF 내보내기 오류:', error);
+    res.status(500).json({
+      success: false,
+      message: 'PDF 생성 중 오류가 발생했습니다.',
+      error: error.message
+    });
+  }
+});
+
+// PDF 내보내기 API V2 (Playwright)
+app.post('/api/export/pdf-v2', async (req, res) => {
+  try {
+    const { templateName = 'report_v1', data, quality = 'standard' } = req.body;
+    
+    if (!data) {
+      return res.status(400).json({
+        success: false,
+        message: '보고서 데이터가 필요합니다.'
+      });
+    }
+
+    // PDF 품질 프로파일 적용
+    const pdfOptions = pdfGeneratorV2.getQualityProfile(quality);
+    
+    // PDF 생성
+    const pdfBuffer = await pdfGeneratorV2.generatePDFFromTemplate(
+      templateEngine, 
+      templateName, 
+      data, 
+      pdfOptions
+    );
+
+    // 응답 헤더 설정
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="report_${Date.now()}.pdf"`);
+    res.setHeader('Content-Length', pdfBuffer.length);
+    
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error('PDF 내보내기 V2 오류:', error);
     res.status(500).json({
       success: false,
       message: 'PDF 생성 중 오류가 발생했습니다.',
@@ -197,6 +240,37 @@ app.post('/api/export/docx', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'DOCX 생성 중 오류가 발생했습니다.',
+      error: error.message
+    });
+  }
+});
+
+// Excel 내보내기 API
+app.post('/api/export/excel', async (req, res) => {
+  try {
+    const { data, templateType = 'template1' } = req.body;
+    
+    if (!data) {
+      return res.status(400).json({
+        success: false,
+        message: '보고서 데이터가 필요합니다.'
+      });
+    }
+
+    // Excel 생성
+    const excelBuffer = await excelGenerator.generateExcel(data, templateType);
+
+    // 응답 헤더 설정
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="report_${Date.now()}.xlsx"`);
+    res.setHeader('Content-Length', excelBuffer.length);
+    
+    res.send(excelBuffer);
+  } catch (error) {
+    console.error('Excel 내보내기 오류:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Excel 생성 중 오류가 발생했습니다.',
       error: error.message
     });
   }

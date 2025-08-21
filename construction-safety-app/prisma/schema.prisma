@@ -1,0 +1,231 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 사용자 모델
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      Role     @default(INSPECTOR)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 관계
+  reports     Report[]
+  sessions    Session[]
+  createdBy   Report[] @relation("ReportCreator")
+  updatedBy   Report[] @relation("ReportUpdater")
+
+  @@map("users")
+}
+
+// 사용자 역할
+enum Role {
+  ADMIN
+  INSPECTOR
+  VIEWER
+}
+
+// 프로젝트 모델
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  location    String
+  contractor  String
+  type        String?
+  budget      Float?
+  startDate   DateTime?
+  endDate     DateTime?
+  status      ProjectStatus @default(ACTIVE)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 관계
+  reports Report[]
+
+  @@map("projects")
+}
+
+// 프로젝트 상태
+enum ProjectStatus {
+  ACTIVE
+  COMPLETED
+  SUSPENDED
+  CANCELLED
+}
+
+// 보고서 모델
+model Report {
+  id            String       @id @default(cuid())
+  templateType  TemplateType
+  projectId     String
+  inspectorId   String
+  reportNumber  String?
+  inspectionDate DateTime
+  weather       String?
+  temperature   String?
+  status        ReportStatus @default(DRAFT)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  createdById   String
+  updatedById   String
+
+  // 관계
+  project       Project       @relation(fields: [projectId], references: [id])
+  inspector     User          @relation(fields: [inspectorId], references: [id])
+  creator       User          @relation("ReportCreator", fields: [createdById], references: [id])
+  updater       User          @relation("ReportUpdater", fields: [updatedById], references: [id])
+  findings      Finding[]
+  recommendations Recommendation[]
+  attachments   Attachment[]
+  auditLogs     AuditLog[]
+
+  @@map("reports")
+}
+
+// 템플릿 타입
+enum TemplateType {
+  TEMPLATE1
+  TEMPLATE2
+  TEMPLATE3
+}
+
+// 보고서 상태
+enum ReportStatus {
+  DRAFT
+  SUBMITTED
+  APPROVED
+  REJECTED
+  ARCHIVED
+}
+
+// 발견사항 모델
+model Finding {
+  id            String   @id @default(cuid())
+  reportId      String
+  category      String
+  description   String
+  severity      Severity
+  lawReference  String?
+  location      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // 관계
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  recommendations Recommendation[]
+
+  @@map("findings")
+}
+
+// 위험도
+enum Severity {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+// 권고사항 모델
+model Recommendation {
+  id          String   @id @default(cuid())
+  reportId    String
+  findingId   String?
+  description String
+  priority    Priority
+  dueDate     DateTime?
+  responsible String?
+  status      RecommendationStatus @default(PENDING)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 관계
+  report   Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  finding  Finding? @relation(fields: [findingId], references: [id])
+
+  @@map("recommendations")
+}
+
+// 우선순위
+enum Priority {
+  URGENT
+  HIGH
+  MEDIUM
+  LOW
+}
+
+// 권고사항 상태
+enum RecommendationStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  OVERDUE
+}
+
+// 첨부파일 모델
+model Attachment {
+  id          String   @id @default(cuid())
+  reportId    String
+  fileName    String
+  fileUrl     String
+  fileType    String
+  fileSize    Int
+  description String?
+  uploadedAt  DateTime @default(now())
+
+  // 관계
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@map("attachments")
+}
+
+// 세션 모델
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  // 관계
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+// 감사 로그 모델
+model AuditLog {
+  id          String      @id @default(cuid())
+  reportId    String
+  action      AuditAction
+  details     Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime    @default(now())
+
+  // 관계
+  report Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@map("audit_logs")
+}
+
+// 감사 액션
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  EXPORT_PDF
+  EXPORT_EXCEL
+  EXPORT_DOCX
+  VIEW
+  APPROVE
+  REJECT
+}
