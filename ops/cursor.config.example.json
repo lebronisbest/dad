@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "safety-report": {
+      "command": "node",
+      "args": ["server/mcp_server.js"],
+      "env": {
+        "TEMPLATE_ID_DEFAULT": "industrial_safety_v1_kr",
+        "TEMPLATE_PATH": "templates/layout.html",
+        "TZ": "Asia/Seoul",
+        "NODE_ENV": "development"
+      }
+    }
+  }
+}

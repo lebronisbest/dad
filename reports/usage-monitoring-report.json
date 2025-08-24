@@ -1,0 +1,22 @@
+{
+  "timestamp": "2025-08-24T14:00:03.376Z",
+  "summary": {
+    "v2_features_used": 0,
+    "total_requests": 0,
+    "usage_percentage": 0
+  },
+  "detailed_stats": {
+    "timestamp": "2025-08-24T14:00:03.372Z",
+    "v2_schema_access": 0,
+    "v2_renderer_access": 0,
+    "v2_compose_access": 0,
+    "flag_accesses": {},
+    "deprecated_warnings": 0,
+    "total_requests": 0
+  },
+  "recommendations": [
+    "V2 컴포저 함수들이 사용되지 않음 - 제거 가능",
+    "V2 PDF 렌더러가 사용되지 않음 - 제거 가능",
+    "V2 스키마가 사용되지 않음 - 제거 가능"
+  ]
+}

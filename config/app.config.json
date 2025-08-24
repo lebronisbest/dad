@@ -1,0 +1,60 @@
+{
+  "app": {
+    "name": "Safety Report MCP Server",
+    "version": "1.0.0",
+    "environment": "development",
+    "timezone": "Asia/Seoul"
+  },
+  "logging": {
+    "level": "info",
+    "console_output": true,
+    "file_output": true,
+    "max_file_size": "10MB",
+    "max_files": 5,
+    "log_directory": "logs"
+  },
+  "cache": {
+    "enable_memory": true,
+    "enable_file": true,
+    "max_memory_size": 100,
+    "default_ttl": 3600000,
+    "cleanup_interval": 3600000
+  },
+  "monitoring": {
+    "enable_performance_monitoring": true,
+    "metrics_collection_interval": 10000,
+    "performance_report_interval": 60000,
+    "max_response_times": 1000,
+    "max_errors": 100
+  },
+  "pdf": {
+    "default_timeout": 30000,
+    "max_concurrent_renders": 3,
+    "output_directory": "downloads",
+    "temp_directory": "temp"
+  },
+  "api": {
+    "rate_limit": {
+      "enabled": true,
+      "max_requests_per_minute": 100,
+      "max_requests_per_hour": 1000
+    },
+    "timeout": {
+      "default": 10000,
+      "pdf_generation": 30000,
+      "web_scraping": 15000
+    }
+  },
+  "security": {
+    "input_validation": true,
+    "sanitize_html": true,
+    "max_file_size": "10MB",
+    "allowed_file_types": ["pdf", "html", "json"]
+  },
+  "performance": {
+    "enable_compression": true,
+    "enable_caching": true,
+    "connection_pooling": true,
+    "max_concurrent_requests": 10
+  }
+}

@@ -1,0 +1,163 @@
+{
+  "template_id": "industrial_safety_v1_kr",
+  "template_version": "1.2.0",
+  "fields": {
+    "report": {
+      "number": "string",
+      "created_at": "string",
+      "title": "string"
+    },
+    "site": {
+      "name": "string",
+      "address": "string",
+      "phone": "string",
+      "email": "string",
+      "management_number": "string",
+      "construction_period": "string",
+      "construction_amount": "string",
+      "responsible_person": "string"
+    },
+    "org": {
+      "name": "string",
+      "inspector": "string",
+      "position": "string",
+      "phone": "string",
+      "email": "string",
+      "registration_number": "string",
+      "license_number": "string",
+      "address": "string"
+    },
+    "visit": {
+      "date": "string",
+      "round": "integer",
+      "round_total": "integer",
+      "purpose": "string"
+    },
+    "progress": {
+      "percent": "integer"
+    },
+    "category": {
+      "type": "string",
+      "subtype": "string",
+      "is_construction": "boolean",
+      "is_electrical": "boolean"
+    },
+    "guide": {
+      "org_name": "string",
+      "inspector": "string",
+      "phone": "string",
+      "previous_completed": "boolean",
+      "previous_incomplete": "boolean"
+    },
+    "work": {
+      "status_html": "string",
+      "description": "string",
+      "is_working_today": "boolean",
+      "today_work": "string",
+      "current_work": "string",
+      "additional_notes": "string"
+    },
+    "notification": {
+      "registered_mail": "boolean",
+      "email": "boolean",
+      "mobile": "boolean",
+      "other": "boolean",
+      "other_method": "string"
+    },
+    "previous_guidance": [
+      {
+        "date": "string",
+        "hazardous_location": "string",
+        "hazardous_factor": "string",
+        "pointed_issue": "string",
+        "implementation_result": "string"
+      }
+    ],
+    "hazards": [
+      {
+        "place": "string",
+        "factor": "string",
+        "measure": "string",
+        "possibility_level": "string",
+        "severity_level": "string",
+        "risk_level": "string",
+        "priority": "string"
+      }
+    ],
+    "risk_assessment": {
+      "possibility": {
+        "high": "string",
+        "medium": "string",
+        "low": "string"
+      },
+      "severity": {
+        "high": "string",
+        "medium": "string",
+        "low": "string"
+      },
+      "improvement_methods": {
+        "high": "string",
+        "medium": "string",
+        "low": "string"
+      }
+    },
+    "future_work": [
+      {
+        "process": "string",
+        "sub_process": "string",
+        "hazardous_factor": "string",
+        "prevention_measure": "string",
+        "notes": "string"
+      }
+    ],
+    "support": [
+      {
+        "type": "string",
+        "content": "string",
+        "notes": "string"
+      }
+    ],
+    "photos": [
+      {
+        "url": "string",
+        "caption": "string",
+        "taken_at": "string",
+        "index": "integer"
+      }
+    ],
+    "findings": {
+      "citations": [
+        {
+          "law": "string",
+          "clause": "string",
+          "revised_at": "string",
+          "url": "string",
+          "snippet": "string",
+          "confidence": "number"
+        }
+      ]
+    }
+  },
+  "validation_rules": {
+    "visit.date": "^\\d{4}-\\d{2}-\\d{2}$",
+    "visit.round": "positive_integer",
+    "progress.percent": "range:0-100",
+    "phone": "^0\\d{1,2}-?\\d{3,4}-?\\d{4}$",
+    "email": "^[^@]+@[^@]+\\.[^@]+$"
+  },
+  "required_fields": [
+    "report.number",
+    "site.name",
+    "site.address",
+    "org.name",
+    "org.inspector",
+    "visit.date",
+    "visit.round",
+    "visit.round_total"
+  ],
+  "format_functions": {
+    "formatDate": "날짜 포맷팅 (YYYY-MM-DD → YYYY.MM.DD)",
+    "roundText": "회차 텍스트 변환 (1 → 1차)",
+    "photoNumber": "사진 번호 변환 (0 → ①, 1 → ②)"
+  }
+}

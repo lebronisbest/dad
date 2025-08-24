@@ -1,0 +1,449 @@
+{
+  "template_id": "industrial_safety_v1_kr",
+  "template_version": "2.0.0",
+  "schema_type": "ui",
+  "description": "산업안전보고서 UI 표시 및 포맷 스키마",
+  
+  "layout": {
+    "type": "responsive",
+    "breakpoints": {
+      "mobile": 768,
+      "tablet": 1024,
+      "desktop": 1200
+    },
+    "grid_system": "12-column",
+    "spacing_unit": "8px"
+  },
+
+  "sections": {
+    "header": {
+      "type": "header",
+      "title": "건설재해예방전문지도기관 기술지도 결과보고서",
+      "subtitle": "안전점검 보고서",
+      "logo": {
+        "src": "/assets/logo.png",
+        "alt": "기관 로고",
+        "width": "120px",
+        "height": "auto"
+      },
+      "styling": {
+        "background": "#f8f9fa",
+        "border_bottom": "2px solid #2563eb",
+        "padding": "20px",
+        "text_align": "center"
+      }
+    },
+    
+    "basic_info": {
+      "type": "section",
+      "title": "1. 기본 정보",
+      "icon": "info",
+      "collapsible": false,
+      "fields": [
+        {
+          "name": "report_info",
+          "type": "card",
+          "title": "보고서 정보",
+          "fields": ["report.number", "report.created_at", "report.title"],
+          "layout": "horizontal",
+          "styling": {
+            "background": "#ffffff",
+            "border": "1px solid #e9ecef",
+            "border_radius": "8px",
+            "padding": "16px"
+          }
+        },
+        {
+          "name": "site_info",
+          "type": "card", 
+          "title": "현장 정보",
+          "fields": ["site.name", "site.address", "site.phone", "site.email"],
+          "layout": "grid",
+          "columns": 2,
+          "styling": {
+            "background": "#ffffff",
+            "border": "1px solid #e9ecef",
+            "border_radius": "8px",
+            "padding": "16px"
+          }
+        },
+        {
+          "name": "org_info",
+          "type": "card",
+          "title": "기관 정보", 
+          "fields": ["org.name", "org.inspector", "org.position", "org.phone"],
+          "layout": "grid",
+          "columns": 2,
+          "styling": {
+            "background": "#ffffff",
+            "border": "1px solid #e9ecef",
+            "border_radius": "8px",
+            "padding": "16px"
+          }
+        }
+      ]
+    },
+    
+    "visit_info": {
+      "type": "section",
+      "title": "2. 점검 정보",
+      "icon": "calendar",
+      "collapsible": false,
+      "fields": [
+        {
+          "name": "visit_details",
+          "type": "card",
+          "title": "점검 세부사항",
+          "fields": ["visit.date", "visit.round", "visit.round_total", "visit.purpose"],
+          "layout": "grid",
+          "columns": 2,
+          "styling": {
+            "background": "#ffffff",
+            "border": "1px solid #e9ecef",
+            "border_radius": "8px",
+            "padding": "16px"
+          }
+        },
+        {
+          "name": "progress_info",
+          "type": "card",
+          "title": "공정 정보",
+          "fields": ["progress.percent"],
+          "layout": "horizontal",
+          "styling": {
+            "background": "#ffffff",
+            "border": "1px solid #e9ecef",
+            "border_radius": "8px",
+            "padding": "16px"
+          }
+        }
+      ]
+    },
+    
+    "safety_assessment": {
+      "type": "section",
+      "title": "3. 안전성 평가",
+      "icon": "security",
+      "collapsible": true,
+      "default_expanded": true,
+      "fields": [
+        {
+          "name": "hazards_list",
+          "type": "table",
+          "title": "위험요소 목록",
+          "data_source": "hazards",
+          "columns": [
+            {
+              "key": "place",
+              "title": "위험장소",
+              "width": "20%",
+              "type": "text"
+            },
+            {
+              "key": "factor", 
+              "title": "위험요소",
+              "width": "25%",
+              "type": "text"
+            },
+            {
+              "key": "measure",
+              "title": "조치사항", 
+              "width": "30%",
+              "type": "textarea"
+            },
+            {
+              "key": "risk_level",
+              "title": "위험도",
+              "width": "10%",
+              "type": "select",
+              "options": [
+                {"value": "1", "label": "1"},
+                {"value": "2", "label": "2"},
+                {"value": "3", "label": "3"},
+                {"value": "4", "label": "4"},
+                {"value": "5", "label": "5"},
+                {"value": "6", "label": "6"},
+                {"value": "7", "label": "7"},
+                {"value": "8", "label": "8"},
+                {"value": "9", "label": "9"}
+              ]
+            },
+            {
+              "key": "priority",
+              "title": "우선순위",
+              "width": "15%",
+              "type": "text"
+            }
+          ],
+          "styling": {
+            "background": "#ffffff",
+            "border": "1px solid #e9ecef",
+            "border_radius": "8px",
+            "overflow": "auto"
+          }
+        }
+      ]
+    },
+    
+    "previous_guidance": {
+      "type": "section",
+      "title": "4. 이전 지도 이력",
+      "icon": "history",
+      "collapsible": true,
+      "default_expanded": false,
+      "visible_if": "visit.round > 1",
+      "fields": [
+        {
+          "name": "guidance_history",
+          "type": "timeline",
+          "data_source": "previous_guidance",
+          "fields": ["date", "hazardous_location", "pointed_issue", "implementation_result"],
+          "styling": {
+            "background": "#ffffff",
+            "border": "1px solid #e9ecef",
+            "border_radius": "8px",
+            "padding": "16px"
+          }
+        }
+      ]
+    },
+    
+    "work_status": {
+      "type": "section",
+      "title": "5. 작업 현황",
+      "icon": "work",
+      "collapsible": true,
+      "default_expanded": true,
+      "fields": [
+        {
+          "name": "current_work",
+          "type": "card",
+          "title": "현재 작업",
+          "fields": ["work.description", "work.is_working_today", "work.today_work"],
+          "layout": "vertical",
+          "styling": {
+            "background": "#ffffff",
+            "border": "1px solid #e9ecef",
+            "border_radius": "8px",
+            "padding": "16px"
+          }
+        }
+      ]
+    },
+    
+    "photos": {
+      "type": "section",
+      "title": "6. 현장 사진",
+      "icon": "photo",
+      "collapsible": true,
+      "default_expanded": true,
+      "visible_if": "photos.length > 0",
+      "fields": [
+        {
+          "name": "photo_gallery",
+          "type": "gallery",
+          "data_source": "photos",
+          "fields": ["url", "caption"],
+          "layout": "grid",
+          "columns": 3,
+          "styling": {
+            "background": "#ffffff",
+            "border": "1px solid #e9ecef",
+            "border_radius": "8px",
+            "padding": "16px"
+          }
+        }
+      ]
+    }
+  },
+
+  "field_types": {
+    "text": {
+      "component": "TextField",
+      "props": {
+        "variant": "outlined",
+        "size": "small",
+        "fullWidth": true
+      }
+    },
+    "textarea": {
+      "component": "TextField",
+      "props": {
+        "variant": "outlined",
+        "size": "small",
+        "fullWidth": true,
+        "multiline": true,
+        "rows": 3
+      }
+    },
+    "select": {
+      "component": "Select",
+      "props": {
+        "variant": "outlined",
+        "size": "small",
+        "fullWidth": true
+      }
+    },
+    "date": {
+      "component": "DatePicker",
+      "props": {
+        "format": "YY.MM.DD(ddd)",
+        "locale": "ko"
+      }
+    },
+    "number": {
+      "component": "TextField",
+      "props": {
+        "variant": "outlined",
+        "size": "small",
+        "fullWidth": true,
+        "type": "number"
+      }
+    },
+    "boolean": {
+      "component": "Checkbox",
+      "props": {
+        "color": "primary"
+      }
+    }
+  },
+
+  "format_functions": {
+    "formatDate": {
+      "description": "날짜를 한국 형식으로 변환",
+      "syntax": "formatDate(value, 'YY.MM.DD(ddd)')",
+      "example": "formatDate('2024-12-19', 'YY.MM.DD(ddd)') → '24.12.19(목)'"
+    },
+    "roundText": {
+      "description": "차수를 텍스트로 변환",
+      "syntax": "roundText(value)",
+      "example": "roundText(1) → '1차'"
+    },
+    "concat": {
+      "description": "여러 값을 연결",
+      "syntax": "concat(value1, 'separator', value2)",
+      "example": "concat(site.name, ' / ', visit.round, '차')"
+    },
+    "case": {
+      "description": "조건부 값 반환",
+      "syntax": "case(condition1, value1, condition2, value2, default)",
+      "example": "case(progress.percent < 30, '초기', progress.percent < 70, '진행중', '완료')"
+    },
+    "photoNumber": {
+      "description": "사진 번호를 기호로 변환",
+      "syntax": "photoNumber(value)",
+      "example": "photoNumber(0) → '①'"
+    }
+  },
+
+  "data_attributes": {
+    "data-field": {
+      "description": "데이터 필드 경로",
+      "example": "data-field=\"site.name\""
+    },
+    "data-format": {
+      "description": "포맷 함수 적용",
+      "example": "data-format=\"formatDate(visit.date, 'YY.MM.DD(ddd)')\""
+    },
+    "data-repeat": {
+      "description": "배열 데이터 반복",
+      "example": "data-repeat=\"hazards\""
+    },
+    "data-if": {
+      "description": "조건부 표시",
+      "example": "data-if=\"visit.round > 1\""
+    },
+    "data-pagebreak": {
+      "description": "페이지 나눔 제어",
+      "values": ["before", "after", "avoid"],
+      "example": "data-pagebreak=\"before\""
+    }
+  },
+
+  "styling": {
+    "colors": {
+      "primary": "#2563eb",
+      "secondary": "#64748b", 
+      "success": "#059669",
+      "warning": "#d97706",
+      "error": "#dc2626",
+      "info": "#0891b2"
+    },
+    "typography": {
+      "font_family": "'Malgun Gothic', '맑은 고딕', 'Noto Sans KR', sans-serif",
+      "font_sizes": {
+        "xs": "12px",
+        "sm": "14px", 
+        "base": "16px",
+        "lg": "18px",
+        "xl": "20px",
+        "2xl": "24px",
+        "3xl": "30px"
+      },
+      "line_heights": {
+        "tight": 1.25,
+        "normal": 1.5,
+        "relaxed": 1.75
+      }
+    },
+    "spacing": {
+      "xs": "4px",
+      "sm": "8px",
+      "md": "16px",
+      "lg": "24px",
+      "xl": "32px",
+      "2xl": "48px"
+    },
+    "borders": {
+      "radius": {
+        "sm": "4px",
+        "md": "8px",
+        "lg": "12px",
+        "xl": "16px"
+      },
+      "widths": {
+        "thin": "1px",
+        "normal": "2px",
+        "thick": "4px"
+      }
+    }
+  },
+
+  "responsive_rules": {
+    "mobile": {
+      "columns": 1,
+      "spacing": "sm",
+      "font_size": "sm"
+    },
+    "tablet": {
+      "columns": 2,
+      "spacing": "md", 
+      "font_size": "base"
+    },
+    "desktop": {
+      "columns": 3,
+      "spacing": "lg",
+      "font_size": "base"
+    }
+  },
+
+  "print_styles": {
+    "page_size": "A4",
+    "margins": {
+      "top": "18mm",
+      "right": "20mm", 
+      "bottom": "18mm",
+      "left": "20mm"
+    },
+    "header_footer": {
+      "enabled": true,
+      "header_text": "건설재해예방전문지도기관 기술지도 결과보고서",
+      "footer_text": "페이지 {page} / {total}"
+    },
+    "page_breaks": {
+      "avoid_orphans": true,
+      "keep_with_next": ["h1", "h2"],
+      "break_before": [".page-break"]
+    }
+  }
+}

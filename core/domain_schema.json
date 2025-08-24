@@ -1,0 +1,405 @@
+{
+  "template_id": "industrial_safety_v1_kr",
+  "template_version": "2.0.0",
+  "schema_type": "domain",
+  "description": "산업안전보고서 데이터 규칙 및 검증 스키마",
+  
+  "data_types": {
+    "string": {
+      "description": "문자열 타입",
+      "validation": "non_empty_string"
+    },
+    "integer": {
+      "description": "정수 타입",
+      "validation": "valid_integer"
+    },
+    "boolean": {
+      "description": "불린 타입",
+      "validation": "valid_boolean"
+    },
+    "date": {
+      "description": "날짜 타입 (YY.MM.DD(요일) 또는 YYYY-MM-DD)",
+      "validation": "valid_date_format"
+    },
+    "array": {
+      "description": "배열 타입",
+      "validation": "valid_array"
+    },
+    "object": {
+      "description": "객체 타입",
+      "validation": "valid_object"
+    }
+  },
+
+  "fields": {
+    "report": {
+      "type": "object",
+      "required": ["number", "created_at", "title"],
+      "properties": {
+        "number": {
+          "type": "string",
+          "description": "보고서 번호",
+          "validation": "non_empty_string",
+          "max_length": 50
+        },
+        "created_at": {
+          "type": "date",
+          "description": "작성일",
+          "validation": "valid_date_format",
+          "default": "current_date"
+        },
+        "title": {
+          "type": "string",
+          "description": "보고서 제목",
+          "validation": "non_empty_string",
+          "max_length": 200
+        }
+      }
+    },
+    
+    "site": {
+      "type": "object",
+      "required": ["name", "address", "responsible_person"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "현장명",
+          "validation": "non_empty_string",
+          "max_length": 100
+        },
+        "address": {
+          "type": "string",
+          "description": "현장 주소",
+          "validation": "non_empty_string",
+          "max_length": 300
+        },
+        "phone": {
+          "type": "string",
+          "description": "연락처",
+          "validation": "phone_format",
+          "max_length": 20
+        },
+        "email": {
+          "type": "string",
+          "description": "이메일",
+          "validation": "email_format",
+          "max_length": 100
+        },
+        "management_number": {
+          "type": "string",
+          "description": "관리번호",
+          "validation": "optional_string",
+          "max_length": 50
+        },
+        "construction_period": {
+          "type": "string",
+          "description": "공사기간",
+          "validation": "optional_string",
+          "max_length": 100
+        },
+        "construction_amount": {
+          "type": "string",
+          "description": "공사금액",
+          "validation": "optional_string",
+          "max_length": 100
+        },
+        "responsible_person": {
+          "type": "string",
+          "description": "책임자",
+          "validation": "non_empty_string",
+          "max_length": 50
+        }
+      }
+    },
+    
+    "org": {
+      "type": "object",
+      "required": ["name", "inspector", "position"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "기관명",
+          "validation": "non_empty_string",
+          "max_length": 100
+        },
+        "inspector": {
+          "type": "string",
+          "description": "점검자",
+          "validation": "non_empty_string",
+          "max_length": 50
+        },
+        "position": {
+          "type": "string",
+          "description": "직책",
+          "validation": "non_empty_string",
+          "max_length": 50
+        },
+        "phone": {
+          "type": "string",
+          "description": "연락처",
+          "validation": "phone_format",
+          "max_length": 20
+        },
+        "email": {
+          "type": "string",
+          "description": "이메일",
+          "validation": "email_format",
+          "max_length": 100
+        },
+        "registration_number": {
+          "type": "string",
+          "description": "등록번호",
+          "validation": "optional_string",
+          "max_length": 50
+        },
+        "license_number": {
+          "type": "string",
+          "description": "면허번호",
+          "validation": "optional_string",
+          "max_length": 50
+        },
+        "address": {
+          "type": "string",
+          "description": "주소",
+          "validation": "optional_string",
+          "max_length": 300
+        }
+      }
+    },
+    
+    "visit": {
+      "type": "object",
+      "required": ["date", "round", "round_total"],
+      "properties": {
+        "date": {
+          "type": "date",
+          "description": "점검일",
+          "validation": "valid_date_format",
+          "default": "current_date"
+        },
+        "round": {
+          "type": "integer",
+          "description": "점검차수",
+          "validation": "positive_integer",
+          "min": 1,
+          "max": 99
+        },
+        "round_total": {
+          "type": "integer",
+          "description": "총 점검차수",
+          "validation": "positive_integer",
+          "min": 1,
+          "max": 99
+        },
+        "purpose": {
+          "type": "string",
+          "description": "점검목적",
+          "validation": "optional_string",
+          "max_length": 200
+        }
+      }
+    },
+    
+    "progress": {
+      "type": "object",
+      "required": ["percent"],
+      "properties": {
+        "percent": {
+          "type": "integer",
+          "description": "공정률 (%)",
+          "validation": "percentage_range",
+          "min": 0,
+          "max": 100
+        }
+      }
+    },
+    
+    "hazards": {
+      "type": "array",
+      "description": "위험요소 목록",
+      "item_type": "object",
+      "min_items": 0,
+      "max_items": 50,
+      "item_properties": {
+        "place": {
+          "type": "string",
+          "description": "위험장소",
+          "validation": "non_empty_string",
+          "max_length": 200
+        },
+        "factor": {
+          "type": "string",
+          "description": "위험요소",
+          "validation": "non_empty_string",
+          "max_length": 300
+        },
+        "measure": {
+          "type": "string",
+          "description": "조치사항",
+          "validation": "non_empty_string",
+          "max_length": 500
+        },
+        "possibility_level": {
+          "type": "string",
+          "description": "발생가능성",
+          "validation": "risk_level",
+          "allowed_values": ["1", "2", "3"]
+        },
+        "severity_level": {
+          "type": "string",
+          "description": "심각도",
+          "validation": "risk_level",
+          "allowed_values": ["1", "2", "3"]
+        },
+        "risk_level": {
+          "type": "string",
+          "description": "위험도",
+          "validation": "risk_level",
+          "allowed_values": ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+        },
+        "priority": {
+          "type": "string",
+          "description": "우선순위",
+          "validation": "optional_string",
+          "max_length": 50
+        }
+      }
+    }
+  },
+
+  "validation_rules": {
+    "non_empty_string": {
+      "type": "string",
+      "min_length": 1,
+      "max_length": 1000,
+      "pattern": "^\\S+.*\\S+$"
+    },
+    "optional_string": {
+      "type": "string",
+      "max_length": 1000,
+      "allow_empty": true
+    },
+    "valid_integer": {
+      "type": "integer",
+      "allow_string": true
+    },
+    "positive_integer": {
+      "type": "integer",
+      "min": 1,
+      "allow_string": true
+    },
+    "percentage_range": {
+      "type": "integer",
+      "min": 0,
+      "max": 100,
+      "allow_string": true
+    },
+    "valid_date_format": {
+      "type": "string",
+      "pattern": "^(\\d{2}\\.\\d{2}\\.\\d{2}\\([월화수목금토일]\\)|\\d{4}-\\d{2}-\\d{2})$"
+    },
+    "phone_format": {
+      "type": "string",
+      "pattern": "^[0-9\\-\\+\\(\\)\\s]+$",
+      "allow_empty": true
+    },
+    "email_format": {
+      "type": "string",
+      "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+      "allow_empty": true
+    },
+    "risk_level": {
+      "type": "string",
+      "pattern": "^[1-9]$"
+    },
+    "valid_array": {
+      "type": "array",
+      "allow_empty": true
+    },
+    "valid_object": {
+      "type": "object",
+      "allow_empty": true
+    }
+  },
+
+  "computed_fields": {
+    "visit.round_text": {
+      "description": "점검차수 텍스트 (예: 1차, 2차)",
+      "formula": "concat(visit.round, '차')",
+      "type": "string"
+    },
+    "site.full_name": {
+      "description": "현장 전체명",
+      "formula": "concat(site.name, ' / ', visit.round_text, ' 점검')",
+      "type": "string"
+    },
+    "progress.status": {
+      "description": "공정 상태",
+      "formula": "case(progress.percent < 30, '초기', progress.percent < 70, '진행중', '완료')",
+      "type": "string"
+    }
+  },
+
+  "conditional_fields": {
+    "hazards": {
+      "when": "hazards.length > 0",
+      "then": {
+        "required": ["place", "factor", "measure"],
+        "visible": true
+      }
+    },
+    "previous_guidance": {
+      "when": "visit.round > 1",
+      "then": {
+        "required": ["date", "hazardous_location", "pointed_issue"],
+        "visible": true
+      }
+    }
+  },
+
+  "default_values": {
+    "report.created_at": "current_date",
+    "visit.date": "current_date",
+    "visit.round": 1,
+    "visit.round_total": 1,
+    "progress.percent": 0,
+    "category.is_construction": true,
+    "category.is_electrical": false
+  },
+
+  "required_fields": [
+    "site.name",
+    "site.address", 
+    "site.responsible_person",
+    "org.name",
+    "org.inspector",
+    "org.position",
+    "visit.date",
+    "visit.round",
+    "visit.round_total",
+    "progress.percent"
+  ],
+
+  "field_groups": {
+    "basic_info": ["report", "site", "org"],
+    "visit_info": ["visit", "progress", "category"],
+    "safety_data": ["hazards", "previous_guidance", "work"],
+    "media": ["photos", "documents"]
+  },
+
+  "validation_weights": {
+    "critical": 10,
+    "high": 5,
+    "medium": 3,
+    "low": 1
+  },
+
+  "field_importance": {
+    "site.name": "critical",
+    "site.address": "critical",
+    "org.inspector": "critical",
+    "visit.date": "high",
+    "hazards": "high",
+    "progress.percent": "medium"
+  }
+}

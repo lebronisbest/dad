@@ -1,0 +1,103 @@
+{
+  "safety_keywords": [
+    "안전", "보건", "위험", "사고", "재해", "예방", "점검", "검사",
+    "교육", "훈련", "보호구", "작업환경", "유해물질", "화학물질",
+    "건설", "공사", "작업", "장비", "기계", "전기", "화재", "폭발",
+    "크레인", "굴삭기", "덤프트럭", "콘크리트", "철근", "거푸집",
+    "고소작업", "용접", "절단", "천공", "발파", "터널", "교량",
+    "안전띠", "안전모", "안전화", "보호안경", "방진마스크", "청각보호구"
+  ],
+  "recommended_sites": {
+    "government": [
+      {
+        "name": "한국산업안전보건공단 (KOSHA)",
+        "url": "https://www.kosha.or.kr/",
+        "description": "산업안전보건법령, 안전보건기술지침, 사고사례 및 통계",
+        "category": "정부기관",
+        "priority": "high"
+      },
+      {
+        "name": "고용노동부",
+        "url": "https://www.moel.go.kr/",
+        "description": "산업안전보건 정책, 법령 개정사항, 안전관리 기준",
+        "category": "정부기관",
+        "priority": "high"
+      },
+      {
+        "name": "건설안전기술공단",
+        "url": "https://www.cst.or.kr/",
+        "description": "건설업 안전기준, 건설기계 안전관리, 안전인증 정보",
+        "category": "공공기관",
+        "priority": "high"
+      }
+    ],
+    "industry": [
+      {
+        "name": "대한건설협회",
+        "url": "https://www.cak.or.kr/",
+        "description": "건설업 안전관리 가이드, 업계 표준 및 기준",
+        "category": "업계협회",
+        "priority": "medium"
+      },
+      {
+        "name": "한국전기안전공사",
+        "url": "https://www.kesco.or.kr/",
+        "description": "전기안전 기준, 전기작업 안전수칙, 사고사례 및 예방법",
+        "category": "공공기관",
+        "priority": "medium"
+      },
+      {
+        "name": "한국가스안전공사",
+        "url": "https://www.kgs.or.kr/",
+        "description": "가스안전 기준, 가스설비 안전관리, 사고예방 가이드",
+        "category": "공공기관",
+        "priority": "medium"
+      }
+    ],
+    "news": [
+      {
+        "name": "안전신문",
+        "url": "https://www.safetynews.co.kr/",
+        "description": "안전 관련 최신 뉴스, 사고사례 분석, 안전관리 동향",
+        "category": "뉴스",
+        "priority": "low"
+      },
+      {
+        "name": "건설타임즈",
+        "url": "https://www.ctnews.co.kr/",
+        "description": "건설업 안전 관련 뉴스, 건설사고 사례, 안전관리 기술 동향",
+        "category": "뉴스",
+        "priority": "low"
+      }
+    ],
+    "guides": [
+      {
+        "name": "KOSHA GUIDE",
+        "url": "https://www.kosha.or.kr/kosha/business/guide.do",
+        "description": "안전보건기술지침 상세 내용, 업종별 안전관리 매뉴얼",
+        "category": "가이드",
+        "priority": "high"
+      },
+      {
+        "name": "건설업 안전작업기준",
+        "url": "https://www.kosha.or.kr/kosha/business/construction.do",
+        "description": "건설업 안전작업 기준, 작업별 안전수칙, 보호구 착용 기준",
+        "category": "가이드",
+        "priority": "high"
+      }
+    ]
+  },
+  "scraping_settings": {
+    "default_timeout": 10000,
+    "max_redirects": 5,
+    "max_text_length": 5000,
+    "max_summary_length": 200,
+    "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+    "remove_selectors": [
+      "script", "style", "noscript", "iframe", "embed", "object", "applet",
+      "form", "nav", "header", "footer", "aside",
+      ".ad", ".advertisement", ".banner", ".popup", ".modal", ".overlay",
+      "[class*=\"ad\"], [id*=\"ad\"], [class*=\"banner\"], [id*=\"banner\"]"
+    ]
+  }
+}
