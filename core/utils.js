@@ -1,3 +1,4 @@
+import { access } from 'fs/promises';
 import dayjs from 'dayjs';
 import ko from 'dayjs/locale/ko.js';
 dayjs.locale(ko);
@@ -217,8 +218,7 @@ class FileNameGenerator {
    */
   static async checkFileExists(filePath) {
     try {
-      const fs = await import('fs/promises');
-      await fs.access(filePath);
+      await access(filePath);
       return true; // 파일이 존재함
     } catch {
       return false; // 파일이 존재하지 않음
