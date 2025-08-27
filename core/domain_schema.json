@@ -167,6 +167,25 @@
       }
     },
     
+    "guide": {
+      "type": "object",
+      "required": [],
+      "properties": {
+        "previous_completed": {
+          "type": "boolean",
+          "description": "이전 지도 완료 여부",
+          "validation": "valid_boolean",
+          "default": false
+        },
+        "previous_incomplete": {
+          "type": "boolean",
+          "description": "이전 지도 미완료 여부",
+          "validation": "valid_boolean",
+          "default": false
+        }
+      }
+    },
+    
     "visit": {
       "type": "object",
       "required": ["date", "round", "round_total"],
@@ -397,7 +416,6 @@
   "field_importance": {
     "site.name": "critical",
     "site.address": "critical",
-    "org.inspector": "critical",
     "visit.date": "high",
     "hazards": "high",
     "progress.percent": "medium"

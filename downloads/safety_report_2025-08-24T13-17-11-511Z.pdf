@@ -1,0 +1,163 @@
+
+    <!DOCTYPE html>
+    <html lang="ko">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>안전보고서</title>
+      <style>
+        body { 
+          font-family: 'Malgun Gothic', 'Arial', sans-serif; 
+          margin: 20px; 
+          line-height: 1.6;
+          color: #333;
+        }
+        .header { 
+          text-align: center; 
+          border-bottom: 2px solid #333; 
+          padding-bottom: 20px; 
+          margin-bottom: 30px; 
+        }
+        .section { 
+          margin-bottom: 25px; 
+          padding: 15px;
+          border: 1px solid #ddd;
+          border-radius: 5px;
+        }
+        .section-title { 
+          font-size: 18px; 
+          font-weight: bold; 
+          color: #333; 
+          margin-bottom: 15px;
+          border-bottom: 1px solid #eee;
+          padding-bottom: 5px;
+        }
+        .field { 
+          margin-bottom: 12px; 
+          display: flex;
+        }
+        .field-label { 
+          font-weight: bold; 
+          color: #555; 
+          min-width: 120px;
+        }
+        .field-value { 
+          margin-left: 15px;
+          flex: 1;
+        }
+        table { 
+          width: 100%; 
+          border-collapse: collapse; 
+          margin: 15px 0; 
+        }
+        th, td { 
+          border: 1px solid #ddd; 
+          padding: 10px; 
+          text-align: left; 
+        }
+        th { 
+          background-color: #f5f5f5; 
+          font-weight: bold;
+        }
+        .footer {
+          margin-top: 40px;
+          text-align: center;
+          color: #666;
+          font-size: 12px;
+          border-top: 1px solid #eee;
+          padding-top: 20px;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <h1>건설재해예방전문지도기관 기술지도 결과보고서</h1>
+        <p>생성일: 2025. 8. 24.</p>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">현장 정보</div>
+        <div class="field">
+          <span class="field-label">현장명:</span>
+          <span class="field-value">?????</span>
+        </div>
+        <div class="field">
+          <span class="field-label">위치:</span>
+          <span class="field-value">미입력</span>
+        </div>
+        <div class="field">
+          <span class="field-label">공사종류:</span>
+          <span class="field-value">미입력</span>
+        </div>
+        <div class="field">
+          <span class="field-label">공사기간:</span>
+          <span class="field-value">미입력</span>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">조직 정보</div>
+        <div class="field">
+          <span class="field-label">업체명:</span>
+          <span class="field-value">?????</span>
+        </div>
+        <div class="field">
+          <span class="field-label">대표자:</span>
+          <span class="field-value">미입력</span>
+        </div>
+        <div class="field">
+          <span class="field-label">안전관리자:</span>
+          <span class="field-value">미입력</span>
+        </div>
+        <div class="field">
+          <span class="field-label">연락처:</span>
+          <span class="field-value">미입력</span>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">점검 정보</div>
+        <div class="field">
+          <span class="field-label">점검일:</span>
+          <span class="field-value">2024-12-19</span>
+        </div>
+        <div class="field">
+          <span class="field-label">점검자:</span>
+          <span class="field-value">??????</span>
+        </div>
+        <div class="field">
+          <span class="field-label">점검차수:</span>
+          <span class="field-value">미입력차</span>
+        </div>
+        <div class="field">
+          <span class="field-label">점검목적:</span>
+          <span class="field-value">미입력</span>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">점검 결과</div>
+        <div class="field">
+          <span class="field-label">진행률:</span>
+          <span class="field-value">미입력%</span>
+        </div>
+        <div class="field">
+          <span class="field-label">공사종류:</span>
+          <span class="field-value">미입력</span>
+        </div>
+      </div>
+      
+      <div class="section">
+        <div class="section-title">특이사항</div>
+        <div class="field">
+          <span class="field-value">특이사항 없음</span>
+        </div>
+      </div>
+      
+      <div class="footer">
+        <p>본 보고서는 건설재해예방전문지도기관에서 작성되었습니다.</p>
+        <p>문의사항: 전화번호 미입력</p>
+      </div>
+    </body>
+    </html>
+  

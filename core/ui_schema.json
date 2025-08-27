@@ -71,7 +71,7 @@
           "name": "org_info",
           "type": "card",
           "title": "기관 정보", 
-          "fields": ["org.name", "org.inspector", "org.position", "org.phone"],
+          "fields": ["org.name", "org.phone"],
           "layout": "grid",
           "columns": 2,
           "styling": {

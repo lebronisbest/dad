@@ -1,0 +1,37 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#f0f8ff"/>
+  <g fill="#4169e1">
+    <!-- 안전모 -->
+    <ellipse cx="100" cy="80" rx="60" ry="20" fill="#4169e1"/>
+    <path d="M 40 80 Q 40 120 100 140 Q 160 120 160 80" fill="#4169e1"/>
+    
+    <!-- 안전모 끈 -->
+    <rect x="90" y="140" width="20" height="30" fill="#4169e1"/>
+    
+    <!-- 체크리스트 -->
+    <rect x="30" y="180" width="140" height="15" fill="#4169e1"/>
+    <rect x="35" y="185" width="130" height="5" fill="#fff"/>
+    
+    <!-- 체크 표시들 -->
+    <g stroke="#fff" stroke-width="2">
+      <line x1="40" y1="187" x2="43" y2="190"/>
+      <line x1="43" y1="190" x2="47" y2="186"/>
+      
+      <line x1="60" y1="187" x2="63" y2="190"/>
+      <line x1="63" y1="190" x2="67" y2="186"/>
+      
+      <line x1="80" y1="187" x2="83" y2="190"/>
+      <line x1="83" y1="190" x2="87" y2="186"/>
+    </g>
+    
+    <!-- 안전 표지판 -->
+    <rect x="120" y="60" width="40" height="40" fill="#ff6b6b"/>
+    <circle cx="140" cy="80" r="15" fill="#fff"/>
+    <text x="140" y="85" text-anchor="middle" font-family="Arial" font-size="16" font-weight="bold" fill="#ff6b6b">
+      !
+    </text>
+  </g>
+  <text x="100" y="210" text-anchor="middle" font-family="Arial" font-size="12" fill="#4169e1">
+    Safety Check
+  </text>
+</svg>

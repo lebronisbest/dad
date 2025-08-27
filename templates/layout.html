@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>건설재해예방전문지도기관 기술지도 결과보고서</title>
+    <!-- 로컬 Tailwind CSS가 render.js에서 주입됩니다 -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', 'Malgun Gothic', sans-serif;
+        }
+        
+        /* 빈 섹션 자동 숨김 */
+        .section:empty {
+            display: none;
+        }
+        
+        /* 페이지 구분을 위한 스타일 */
+        .page-break {
+            page-break-after: always;
+            border-top: 2px dashed #cbd5e0;
+            margin-top: 2rem;
+            padding-top: 2rem;
+        }
+        
+        /* 인쇄 최적화 */
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                margin: 0;
+                padding: 0;
+            }
+            .page-break {
+                page-break-after: always;
+                border-top: none;
+                margin: 0;
+                padding: 0;
+                height: 0;
+                overflow: hidden;
+            }
+            .avoid-break {
+                page-break-inside: avoid;
+            }
+            /* PDF 렌더링 최적화 */
+            * {
+                box-sizing: border-box;
+            }
+            section {
+                page-break-inside: avoid;
+            }
+        }
+        
+        /* 테이블 테두리 스타일 */
+        table, th, td {
+            border: 1px solid #4a5568;
+        }
+        th, td {
+            padding: 0.5rem 0.75rem;
+            vertical-align: middle;
+            text-align: center;
+        }
+        
+        /* 표/리스크매트릭스 인쇄 안정화 */
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+        thead { 
+            display: table-header-group; /* 페이지 넘어가도 헤더 반복 */
+        }
+        tfoot { 
+            display: table-footer-group; 
+        }
+        th, td { 
+            padding: 6pt 8pt; 
+            border: 1px solid #ddd; 
+        }
+        tbody tr { 
+            page-break-inside: avoid; 
+        }
+        
+        /* 헤더 셀 스타일 */
+        th {
+            background-color: #f0f4f8; /* 약간 더 진한 회색 */
+            font-weight: 600;
+        }
+        /* 기본 셀 스타일 */
+        td {
+            background-color: #ffffff;
+        }
+        /* 결재 테이블 특별 스타일 */
+        .approval-table {
+            border: 2px solid #1f2937 !important;
+        }
+        .approval-table th,
+        .approval-table td {
+            border: 1px solid #1f2937 !important;
+        }
+        .approval-table .vertical-text {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+        
+                /* 사진 그리드 스타일 - 이미지와 완전히 일치 */
+        .photo-grid-container {
+            width: 100%;
+            padding: 1rem 0;
+        }
+        
+        .photo-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .photo-item {
+            flex: 1;
+            max-width: calc(50% - 0.75rem);
+        }
+        
+        .photo-placeholder {
+            background: #ffffff;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            padding: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .photo-image {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+        
+        .photo-image::before {
+            content: "📷";
+            font-size: 1.5rem;
+            opacity: 0.4;
+        }
+        
+        .photo-number {
+            position: absolute;
+            top: 0.25rem;
+            left: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: #6b7280;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 0.125rem 0.375rem;
+            border-radius: 2px;
+        }
+        
+        .photo-caption {
+            text-align: center;
+        }
+        
+        .caption-main {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #374151;
+            margin: 0 0 0.25rem 0;
+            line-height: 1.2;
+        }
+        
+        .caption-sub {
+            font-size: 0.625rem;
+            color: #6b7280;
+            margin: 0;
+            line-height: 1.2;
+        }
+        
+        /* 인쇄 시 사진 그리드 최적화 */
+        @media print {
+            .photo-row {
+                page-break-inside: avoid;
+                margin-bottom: 1.5rem;
+            }
+            
+            .photo-item {
+                page-break-inside: avoid;
+            }
+            
+            .photo-placeholder {
+                border: 1px solid #4a5568;
+                background: #ffffff;
+                box-shadow: none;
+            }
+            
+            .photo-image {
+                background: #f8f9fa;
+                border: 1px solid #dee2e6;
+            }
+        }
+        
+        /* 결재 서명 스타일 */
+        .signature-section {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+        }
+        .signature-circle {
+            width: 2.5rem;
+            height: 2.5rem;
+            border: 2px solid #1f2937;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .signature-line {
+            width: 1.25rem;
+            height: 0.125rem;
+            background-color: #1f2937;
+            border-radius: 0.0625rem;
+        }
+        /* 체크박스 스타일 */
+        .custom-checkbox {
+            width: 1rem;
+            height: 1rem;
+            border: 1px solid #4a5568;
+            display: inline-block;
+            margin-right: 0.25rem;
+            vertical-align: middle;
+        }
+        .highlight-red {
+            background-color: #fef2f2;
+            color: #ef4444;
+        }
+        
+        /* 사진 대지 표준(3×N 그리드 + 캡션/참조) */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10pt;
+        }
+        .photo-item {
+            border: 1px solid #ddd;
+            padding: 8pt;
+            border-radius: 4pt;
+        }
+        .photo-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 2pt;
+        }
+        figcaption {
+            font-size: 9pt;
+            color: #555;
+            margin-top: 4pt;
+            text-align: center;
+        }
+        
+        /* 법령 인용 박스 */
+        .citation-box {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 6pt;
+            padding: 12pt;
+            margin: 16pt 0;
+        }
+        .citation-item {
+            margin-bottom: 8pt;
+            padding-bottom: 8pt;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .citation-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        /* 폰트/여백 고정(인쇄 깡패 세팅) */
+        body {
+            font-size: 10.5pt;
+            line-height: 1.5;
+        }
+        h1, h2, h3 {
+            font-size: 11pt;
+            line-height: 1.4;
+        }
+        table {
+            font-size: 9pt;
+            line-height: 1.4;
+        }
+        .photo-grid figcaption {
+            font-size: 8pt;
+            line-height: 1.3;
+        }
+        
+        /* 인용 필요 경고 배지 */
+        .citation-warning {
+            display: inline-block;
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 4pt 8pt;
+            border-radius: 4pt;
+            font-size: 8pt;
+            border: 1px solid #ffeaa7;
+        }
+    </style>
+</head>
+<body class="bg-white p-4 sm:p-8">
+
+        <!-- ==================== 페이지 1 ==================== -->
+        <section id="page1" class="section">
+                    <!-- 헤더: 로고, 회사명, 슬로건, 결재란 -->
+        <header class="flex flex-row justify-between items-center mb-6" style="display: flex !important; flex-direction: row !important; align-items: center !important;">
+            <div class="flex-1 flex items-center" style="display: flex !important; align-items: center !important;">
+                <div class="flex flex-col items-center" style="display: flex !important; flex-direction: column !important; align-items: center !important;">
+                    <svg class="h-40 w-auto" viewBox="0 0 1920 800" xmlns="http://www.w3.org/2000/svg" style="height: 30rem !important;">
+                        <defs>
+                            <linearGradient id="_무제_그라디언트_61" data-name="무제 그라디언트 61" x1="246.9" y1="671.8" x2="214.7" y2="465.3" gradientUnits="userSpaceOnUse">
+                                <stop offset="0" stop-color="#040000"/>
+                                <stop offset="1" stop-color="#1c2d5d"/>
+                            </linearGradient>
+                            <linearGradient id="_무제_그라디언트_60" data-name="무제 그라디언트 60" x1="357.2" y1="615.8" x2="380.3" y2="701.9" gradientUnits="userSpaceOnUse">
+                                <stop offset="0" stop-color="#c57d3a"/>
+                                <stop offset="1" stop-color="#423317"/>
+                            </linearGradient>
+                        </defs>
+                        <g>
+                            <path d="M239.7,486.4c28.9-5.6,62.7,7.2,90.2,13l5.5-11.3c-30.9-6.5-68.6-21.6-95.7-1.7Z" fill="#040000"/>
+                            <path d="M213.7,442.4c-81.4,33-82.9,140.1-15.6,202.5,34.6,32.1,73.3,45.6,118.4,56.5l10.9-12.2c-41.9-10.2-87.9-26.6-120.1-56.4-61.2-56.7-54.9-155,6.4-190.3Z" fill="url(#_무제_그라디언트_61)"/>
+                        </g>
+                        <g>
+                            <path d="M274.6,521l-8.6,3.8c-4.3,1.9-7.2,6-7.6,10.7l-3.5,38.8,15.8-10.2,3.9-43.1Z" fill="#36327e"/>
+                            <path d="M280.6,580.2l-3.8,39.9c4.1,1.6,8.3,3,12.6,4.2l5.3-54.8-14,10.6Z" fill="#323591"/>
+                        </g>
+                        <path d="M333.7,444.3l-51.8-14.2c-119.9-13.9-153.6,129.1-74.5,202.5,32.2,29.8,78.1,46.2,120.1,56.4l10.5-148.6c.2-3-1.8-5.6-4.7-6.3l-58.6-13.2-3.9,43.1,24,5.4-5.3,54.8c-22-6.2-41.4-17.5-55.6-35.7-21.3-27.3-27-65.2-3.6-93.2,27.4-32.9,70.8-14.6,105.5-7.3l9.2-19.4c4.7-9.9-.7-21.5-11.2-24.4Z" fill="#594f9f"/>
+                        <polygon points="270.7 564.2 254.9 574.4 280.6 580.2 294.7 569.5 270.7 564.2" fill="#040000"/>
+                        <path d="M354.6,493.8l16,4-13.6,206.8,1.7,2.4,43.6,27.6,12.8-261.6c.2-3.7-2.3-7-5.8-7.9l-30.8-8" fill="#ec9b4c"/>
+                        <path d="M378.3,457.2l-6.7-1.7c-2-.5-4,.3-5.1,2l-25.4,40.2,13.6-4,23.7-36.6Z" fill="#e18737"/>
+                        <polygon points="356 501.5 341.1 497.8 354.6 493.8 370.7 497.8 356 501.5" fill="#040000"/>
+                        <path d="M357,704.7h0l13.6-206.8-14.6,3.7-16,215.7c-.3,4,1.7,7.8,5.1,9.8l37.2,21.8c1.6.9,3.6.7,4.9-.5l15-13.7-45.3-30Z" fill="url(#_무제_그라디언트_60)"/>
+                        <polygon points="356 501.5 369.6 514.1 370.7 497.8 356 501.5" fill="#040000"/>
+                        <g>
+                            <rect x="466.8" y="501.5" width="1411.1" height="295.8" fill="none"/>
+                            <path d="M561.9,620.6l-10.9,15.7c-16.6-7-28.3-21.3-34.7-38.4-6.4,18.7-18.2,34.3-35.1,41.9l-11.2-15.7c23.5-10.4,35.7-36.8,35.9-60.8v-9h-30.4v-16.3h80.4v16.3h-29.8v9c.2,22.9,12,47.5,35.9,57.3ZM569.9,524.3h20.2v142.5h-20.2v-142.5Z" fill="#040000"/>
+                            <path d="M706.4,583.2l1,14.4c-11.2,1.9-22.7,3.2-34.3,4v27.1h-20.2v19.5h86.4v16h-106.3v-42.6h19.8v-18.7c-12.6.5-24.8.5-35.5.5l-2.6-15.7c26.3-.3,61.5-.5,91.6-4.5ZM661.3,529.4c20.8,0,35.5,10.4,35.5,25.6s-14.7,25-35.5,25-35.7-9.8-35.9-25c.2-15.2,14.7-25.6,35.9-25.6ZM661.3,565.6c9.6,0,16.5-3.7,16.6-10.6-.2-7.2-7-11-16.6-10.9-10.1-.2-17,3.7-17,10.9s6.9,10.6,17,10.6ZM736.2,632.2h-20.2v-11.5h-27.2v-13.4h27.2v-82.6h20.2v107.6Z" fill="#040000"/>
+                            <path d="M792.4,534.8h15.4c-11,14.7-19.5,44.3-19.5,70.4s8.5,56,19.5,70.7h-15.4c-14.1-19.8-21.4-42.9-21.4-70.7s7.4-50.7,21.4-70.4Z" fill="#040000"/>
+                            <path d="M871.8,553.4c-19-.2-33.6,14.9-33.6,42.3s14.4,42.4,34.3,42.6c18.2-.2,30.3-11.5,30.4-29.8h-27.9v-14.1h44.8v12.8c-.2,28.7-19.8,46.7-47.4,46.7s-51.4-22.4-51.5-58.3c.2-36,21.4-58.1,50.9-57.9,24.3-.2,43.2,15,47.1,37.1h-17.6c-4.3-13.3-14.4-21.6-29.5-21.4Z" fill="#040000"/>
+                            <path d="M980.6,652.3h-17.3v-96h-.6l-26.9,17.6v-16.3l28.2-18.6h16.6v113.3Z" fill="#040000"/>
+                            <path d="M1020.3,676h-15.4c11-14.7,19.5-44.3,19.5-70.4s-8.5-56-19.5-70.7h15.4c14.1,19.8,21.4,42.9,21.4,70.7s-7.4,50.7-21.4,70.4Z" fill="#040000"/>
+                            <path d="M1101,533.6c21.8,0,38.7,15,38.7,36.2s-17,36.2-38.7,36.2-39.1-15.2-39.1-36.2,17.3-36.2,39.1-36.2ZM1101,588.6c11-.2,19.4-7.2,19.5-18.9-.2-11.8-8.5-18.7-19.5-18.9-10.7.2-19.5,7-19.5,18.9s8.8,18.7,19.5,18.9ZM1081.5,617.1h20.2v31.1h77.5v16h-97.6v-47.1ZM1174,565.3h19.2v16.6h-19.2v46.1h-20.2v-103.4h20.2v40.7Z" fill="#040000"/>
+                            <path d="M1239.1,552.1v-1.9h-28.8v-16h77.2v16h-28.2v2.2c0,16.5,10.1,34.1,32.7,41.6l-9.9,15.7c-15.7-5.3-26.6-15.5-32.7-28.3-6.2,14.2-17.6,25.6-34.3,31.2l-10.2-16c23.4-7.2,34.1-25.8,34.3-44.2ZM1231.1,619.4h19.8v28.8h77.8v16h-97.6v-44.8ZM1325.6,628.3h-19.8v-50.9h-23.4v-16h23.4v-36.8h19.8v103.7Z" fill="#040000"/>
+                            <path d="M1406.7,555h-48.7v-15.7h68.8c.2,43.1-15,79.1-65.9,103.1l-10.2-16c36.7-17.4,52.8-39.9,56-71.4ZM1469.8,666.7h-20.2v-142.5h20.2v142.5Z" fill="#040000"/>
+                            <path d="M1484.2,580.3h130v15.7h-55.4v9.6h39.4v36.5h-79.4v8.6h83.2v15h-102.8v-37.8h79.4v-7.4h-79.4v-15h39.7v-9.6h-54.7v-15.7ZM1607.4,559.5l-6.4,15c-24.8-2.9-42.9-12.2-52-25.3-9.1,13.1-27.2,22.4-51.7,25.3l-6.7-15c32-3.4,48.2-17.3,48.3-31.4v-2.9h20.5v2.9c0,14.1,16.3,28,48,31.4Z" fill="#040000"/>
+                            <path d="M1709.2,583.2l1,14.4c-11.2,1.9-22.7,3.2-34.3,4v27.1h-20.2v19.5h86.4v16h-106.3v-42.6h19.8v-18.7c-12.6.5-24.8.5-35.5.5l-2.6-15.7c26.3-.3,61.5-.5,91.6-4.5ZM1664.1,529.4c20.8,0,35.5,10.4,35.5,25.6s-14.7,25-35.5,25-35.7-9.8-35.9-25c.2-15.2,14.7-25.6,35.9-25.6ZM1664.1,565.6c9.6,0,16.5-3.7,16.6-10.6-.2-7.2-7-11-16.6-10.9-10.1-.2-17,3.7-17,10.9s6.9,10.6,17,10.6ZM1739,632.2h-20.2v-11.5h-27.2v-13.4h27.2v-82.6h20.2v107.6Z" fill="#040000"/>
+                        </g>
+                    </svg>
+                    <div class="flex flex-col justify-center mt-2">
+                        <p class="text-sm text-blue-700 font-medium">"어떠한 보상도 재해로 나빠진 삶의 질을 대신 할 수 없어요..!"</p>
+                    </div>
+                </div>
+            </div>
+            <div class="w-64 ml-8">
+                <table class="w-full border-collapse text-sm approval-table">
+                    <tr>
+                        <th rowspan="3" class="w-1/6 bg-gray-100 font-bold text-gray-800 text-center align-middle vertical-text">
+                            결재
+                        </th>
+                        <th class="w-1/4 bg-gray-100 font-bold text-gray-800 text-center py-1">담당</th>
+                        <th class="w-1/4 bg-gray-100 font-bold text-gray-800 text-center py-1">부서장</th>
+                        <th class="w-1/4 bg-gray-100 font-bold text-gray-800 text-center py-1">대표</th>
+                    </tr>
+                    <tr>
+                        <td class="h-12 bg-white"></td>
+                        <td class="h-12 bg-white"></td>
+                        <td class="h-12 bg-white"></td>
+                    </tr>
+                    <tr>
+                        <td class="h-4 bg-white text-center text-gray-600 text-sm">/</td>
+                        <td class="h-4 bg-white text-center text-gray-600 text-sm">/</td>
+                        <td class="h-4 bg-white text-center text-gray-600 text-lg">/</td>
+                    </tr>
+                </table>
+            </div>
+        </header>
+
+            <!-- 문서 제목 -->
+            <h2 class="text-5xl font-bold text-center my-10 pt-8 pb-8" style="font-size: 3rem !important; text-align: center !important; display: block !important; margin-left: auto !important; margin-right: auto !important; font-weight: 700 !important; line-height: 1.2 !important; border-top: 7px solid black !important; border-bottom: 7px solid black !important;">
+                건설재해예방전문지도기관 기술지도 결과보고서
+            </h2>
+
+            <!-- 1. 기술지도 대상사업장 -->
+            <section class="mb-8 section">
+                <h3 class="text-lg font-bold mb-3 text-left">1. 기술지도 대상사업장</h3>
+                <table class="w-full border-collapse text-sm">
+                    <tbody>
+                        <tr>
+                            <th rowspan="4" class="w-16">현장</th>
+                            <th class="w-32">현장명</th>
+                            <td colspan="3" class="text-left" data-field="site.name"></td>
+                            <th class="w-32">사업장관리번호<br>(사업개시번호)</th>
+                            <td class="w-40" data-field="site.management_number"></td>
+                        </tr>
+                        <tr>
+                            <th>공사기간</th>
+                            <td colspan="3" class="text-left" data-field="site.construction_period"></td>
+                            <th class="w-24">공사금액</th>
+                            <td class="text-left" data-field="site.construction_amount"></td>
+                        </tr>
+                        <tr>
+                            <th>책임자</th>
+                            <td colspan="3" class="text-left" data-field="site.responsible_person"></td>
+                            <th>연락처<br>(이메일)</th>
+                            <td colspan="1" class="text-left">
+                                <span data-field="site.phone"></span><br>
+                                <span data-field="site.email"></span>
+                            </td>							
+                        </tr>
+                        <tr>
+                            <th>주소</th>
+                            <td colspan="5" class="text-left" data-field="site.address"></td>
+                        </tr>
+                        <tr>
+                            <th rowspan="3" class="w-16">본사</th>
+                            <th>회사명</th>
+                            <td colspan="3" class="text-left" data-field="org.name"></td>
+                            <th>법인등록번호<br>(사업자등록번호)</th>
+                            <td data-field="org.registration_number"></td>
+                        </tr>
+                        <tr>
+                            <th>면허번호</th>
+                            <td colspan="3" class="text-left" data-field="org.license_number"></td>
+                            <th>연락처</th>
+                            <td colspan="3" data-field="org.phone"></td>
+                        </tr>
+                        <tr>
+                            <th>주소</th>
+                            <td colspan="5" class="text-left" data-field="org.address"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- 2. 기술지도 개요 -->
+            <section class="section">
+                <h3 class="text-lg font-bold mb-3 text-left">2. 기술지도 개요</h3>
+                <table class="w-full border-collapse text-sm">
+                    <tbody>
+                        <tr>
+                            <th class="w-32">지도기관명</th>
+                            <td class="text-left" data-field="myorg.name">&nbsp;</td>
+                            <th class="w-32">기술지도실시일</th>
+                            <td class="w-40" data-field="visit.date" data-format="formatDate"></td>
+                        </tr>
+                        <tr>
+                            <th>구분</th>
+                            <td class="text-left">
+                                <span class="custom-checkbox" data-checkbox="category.is_construction"></span><span>건설</span> /
+                                <span class="custom-checkbox" data-checkbox="category.is_electrical"></span>전기·정보통신
+                            </td>
+                            <th>공정률</th>
+                            <td>( <span data-field="progress.percent"></span> ) %</td>
+                        </tr>
+                        <tr>
+                            <th>횟수</th>
+                            <td>( <span data-field="visit.round" data-format="roundText"></span> ) 회차 / 총 ( <span data-field="visit.round_total"></span> ) 회</td>
+                            <th>담당 요원</th>
+                            <td data-field="myorg.inspector"></td>
+                        </tr>
+                        <tr>
+                            <th>이전 기술지도<br>이행여부</th>
+                            <td class="text-left">
+                                <span class="custom-checkbox" data-checkbox="guide.previous_completed"></span>이행 / 
+                                <span class="custom-checkbox" data-checkbox="guide.previous_incomplete"></span>불이행
+                            </td>
+                            <th>연락처</th>
+                            <td data-field="myorg.phone"></td>
+                        </tr>
+                        <tr>
+                            <th>현장책임자 등<br>통보방법</th>
+                            <td colspan="3" class="text-left">
+                                <div class="flex items-center flex-wrap space-x-4">
+                                    <span>직접전달 ( 성명: <span class="inline-block w-20 border-b border-gray-500" data-field="site.responsible_person"></span> 서명: ( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ) )</span>
+                                    <span>
+                                        <span class="custom-checkbox" data-checkbox="notification.registered_mail"></span>등기우편 /
+                                        <span class="custom-checkbox" data-checkbox="notification.email"></span>전자우편</span> /
+                                        <span class="custom-checkbox" data-checkbox="notification.mobile"></span>모바일 /
+                                        <span class="custom-checkbox" data-checkbox="notification.other"></span>기타 ( <span data-field="notification.other_method"></span> )
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>작업 상황 및<br>특이사항</th>
+                            <td colspan="3" class="h-24 align-top text-left">
+                                <p><span class="custom-checkbox" data-checkbox="work.is_working_today"></span>금일작업중인 사항 : <span data-field="work.today_work"></span></p>
+                                <p>- 현재 작업내용 : <span data-field="work.current_work"></span></p>
+                                <p data-field="work.additional_notes"></p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </section>
+
+      <div class="page-break"></div>
+
+        <!-- ==================== 페이지 2 ==================== -->
+        <section id="page2" class="section">
+            <!-- 3. 이전 기술지도 사항 이행여부 -->
+            <section class="mb-8 section">
+                <h3 class="text-lg font-bold mb-3 text-left">3. 이전 기술지도 사항 이행여부</h3>
+                <table class="w-full border-collapse text-sm">
+                    <thead>
+                        <tr>
+                            <th>지도일<br>(확인일)</th>
+                            <th>유해·위험장소</th>
+                            <th>유해·위험요인</th>
+                            <th>지적사항</th>
+                            <th>이행<br>결과</th>
+                        </tr>
+                    </thead>
+                    <tbody data-repeat="previous_guidance">
+                        <tr>
+                            <td data-field="date" data-format="formatDate"></td>
+                            <td rowspan="1" class="text-left" data-field="hazardous_location"></td>
+                            <td class="text-left" data-field="hazardous_factor"></td>
+                            <td class="text-left" data-field="pointed_issue"></td>
+                            <td rowspan="1" data-field="implementation_result"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- 4. 현재 공정 내 현존하는 위험성 평가 -->
+            <section class="section">
+                <h3 class="text-lg font-bold mb-3 text-left">4. 현재 공정 내 현존하는&nbsp; 위험성 제거&nbsp; &nbsp;</h3>
+                <h3 class="text-lg font-bold mb-3 text-left">위험성 평가(3레벨-3x3단계)</h3>
+                <table class="w-full border-collapse text-sm">
+                    <thead>
+                        <tr>
+                            <th>구분</th>
+                            <th colspan="2">가능성(빈도)</th>
+                            <th>구분</th>
+                            <th colspan="2">중대성(강도)</th>
+                            <th colspan="2">구분</th>
+                            <th colspan="1">개선방법</th>
+                        </tr>
+                        <tr>
+                            <td>상</td>
+                            <td>높음</td>
+                            <td>3</td>
+                            <td>대</td>
+                            <td>사망(장애 발생)</td>
+                            <td>3</td>
+                            <td>6~9</td>
+                            <td>높음</td>
+                            <td>즉시 개선</td>
+                        </tr>
+                        <tr>
+                            <td>중</td>
+                            <td>보통</td>
+                            <td>2</td>
+                            <td>중</td>
+                            <td>업무 복귀 및 완치 가능</td>
+                            <td>2</td>
+                            <td>3~4</td>
+                            <td>보통</td>
+                            <td>개선</td>
+                        </tr>
+                        <tr>
+                            <td>하</td>
+                            <td>낮음</td>
+                            <td>1</td>
+                            <td>소</td>
+                            <td>아차 사고 초래 위험</td>
+                            <td>1</td>
+                            <td>1~2</td>
+                            <td>낮음</td>
+                            <td>필요에 따라 개선</td>
+                        </tr>
+                    </thead>
+                </table>
+                <br>
+                <table class="w-full border-collapse text-sm mt-[-1px]">
+                    <thead>
+                        <tr>
+                            <th>유해·위험장소</th>
+                            <th>유해·위험요인</th>
+                            <th>개선방법</th>
+                            <th>가능성<br>(빈도)</th>
+                            <th>중대성<br>(강도)</th>
+                            <th>위험성<br>수준</th>
+                            <th>개선<br>우선순위</th>
+                        </tr>
+                    </thead>
+                    <tbody data-repeat="hazards">
+                        <tr>
+                            <td class="text-left" data-field="place"></td>
+                            <td class="text-left" data-field="factor"></td>
+                            <td class="text-left" data-field="measure"></td>
+                            <td data-field="possibility_level"></td>
+                            <td data-field="severity_level"></td>
+                            <td data-field="risk_level"></td>
+                            <td data-field="priority"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </section>
+
+        <div class="page-break"></div>
+        
+        <!-- ==================== 페이지 3 ==================== -->
+        <section id="page3" class="section">
+            <!-- 5. 향후 진행공정에 대한 유해·위험 요인 파악 및 대책 -->
+            <section class="mb-8 section">
+                <h3 class="text-lg font-bold mb-3 text-left">5. 향후 진행공정에 대한 유해·위험 요인 파악 및 대책</h3>
+                <table class="w-full border-collapse text-sm">
+                    <thead>
+                        <tr>
+                            <th colspan="2">다음방문 시 까지 발생하<br>는 주요 진행 공정</th>
+                            <th>유해·위험<br>요인</th>
+                            <th>유해·위험요인을 제거하기 위한 예방대책</th>
+                            <th>비고</th>
+                        </tr>
+                    </thead>
+                    <tbody data-repeat="future_work">
+                        <tr>
+                          <td rowspan="2" data-field="process">진행공정*</td>
+                            <td data-field="sub_process">&nbsp;</td>
+                            <td data-field="hazardous_factor"><br></td>
+                            <td class="text-left" data-field="prevention_measure">&nbsp;</td>
+                            <td data-field="notes"></td>
+                        </tr>
+                        <tr>
+                            <td data-field="sub_process">&nbsp;</td>
+                            <td data-field="hazardous_factor">&nbsp;</td>
+                            <td class="text-left" data-field="prevention_measure">&nbsp;</td>
+                            <td data-field="notes"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- 6. 사업장 지원 사항 등 기타 사항 -->
+            <section class="section">
+                <h3 class="text-lg font-bold mb-3 text-left">6. 사업장 지원 사항 등 기타 사항</h3>
+                <table class="w-full border-collapse text-sm">
+                    <thead>
+                        <tr>
+                            <th>자료<br>제공</th>
+                            <th>구체적 사항</th>
+                            <th>비고</th>
+                        </tr>
+                    </thead>
+                    <tbody data-repeat="support">
+                        <tr>
+                            <td data-field="type"></td>
+                            <td class="text-left text-blue-600" data-field="content"></td>
+                            <td data-field="notes"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </section>
+        
+        <div class="page-break"></div>
+
+        <!-- ==================== 페이지 4 ==================== -->
+        <section id="page4" class="section">
+            <h2 class="text-2xl font-bold text-center my-6">사 진 대 지</h2>
+            
+            <!-- 사진 그리드 컨테이너 -->
+            <div class="photo-grid-container avoid-break" data-repeat="photos">
+                <div class="photo-item">
+                    <figure class="text-center">
+                        <img class="photo-image" data-image="url" alt="">
+                        <figcaption class="photo-caption">
+                            <div class="caption-main" data-field="caption_main"></div>
+                            <div class="caption-sub" data-field="caption_sub"></div>
+                        </figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

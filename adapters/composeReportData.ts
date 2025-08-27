@@ -1,5 +1,4 @@
 import { ReportV1, validateReportV1 } from '../contracts/report.v1';
-import { ReportV2, validateReportV2, migrateV1ToV2 } from '../contracts/report.v2';
 import { Flags, getFlagWithLogging } from '../infra/flags';
 
 // LayoutContext는 layout.html에서 사용할 수 있는 통합된 데이터 구조
@@ -113,29 +112,7 @@ export interface LayoutContext {
   caption_main?: string;
   caption_sub?: string;
   
-  // V2 전용 필드들
-  metadata?: {
-    version: string;
-    created_at: string;
-    updated_at: string;
-    created_by: string;
-    template_version: string;
-  };
-  
-  safety_summary?: {
-    total_risks?: number;
-    high_risk_count?: number;
-    medium_risk_count?: number;
-    low_risk_count?: number;
-    overall_safety_score?: number;
-  };
-  
-  compliance?: {
-    applicable_laws?: string[];
-    compliance_status?: string;
-    violations_found?: string[];
-    corrective_actions?: string[];
-  };
+
   
   // 렌더링 메타데이터
   _render: {
@@ -235,72 +212,19 @@ export const composeV1ReportData = (data: ReportV1, requestId: string): LayoutCo
   };
 };
 
-// V2 데이터를 LayoutContext로 변환
-export const composeV2ReportData = (data: ReportV2, requestId: string): LayoutContext => {
-  // V2 기능 사용 로깅
-  console.log(`[V2_USAGE] composeV2ReportData called at ${new Date().toISOString()}`);
-  
-  const validatedData = validateReportV2(data);
-  const defaults = setDefaultValues(validatedData);
-  
-  return {
-    ...defaults,
-    metadata: validatedData.metadata,
-    safety_summary: validatedData.safety_summary,
-    compliance: validatedData.compliance,
-    _render: {
-      version: "2.0",
-      timestamp: new Date().toISOString(),
-      request_id: requestId,
-      template_version: "2.0",
-    },
-  };
-};
 
-// V1을 V2로 마이그레이션하여 LayoutContext로 변환
-export const composeV1AsV2ReportData = (data: ReportV1, requestId: string): LayoutContext => {
-  // V2 마이그레이션 기능 사용 로깅
-  console.log(`[V2_MIGRATION] composeV1AsV2ReportData called at ${new Date().toISOString()}`);
-  
-  const v2Data = migrateV1ToV2(data);
-  return composeV2ReportData(v2Data, requestId);
-};
 
-// 통합 컴포저 함수 (버전 자동 감지)
+
+
+// 통합 컴포저 함수 (V1만 지원)
 export const composeReportData = (
   data: unknown, 
   requestId: string, 
-  forceVersion?: "1" | "2"
+  forceVersion?: "1"
 ): LayoutContext => {
   try {
-    // 강제 버전이 지정된 경우
-    if (forceVersion === "1") {
-      return composeV1ReportData(data as ReportV1, requestId);
-    }
-    
-    if (forceVersion === "2") {
-      // V2 기능 사용 로깅
-      console.log(`[V2_FORCE] Force V2 version requested at ${new Date().toISOString()}`);
-      
-      // V2 데이터인지 먼저 확인
-      const v2Result = (data as any).metadata?.version === "2.0";
-      if (v2Result) {
-        return composeV2ReportData(data as ReportV2, requestId);
-      } else {
-        // V1을 V2로 마이그레이션
-        return composeV1AsV2ReportData(data as ReportV1, requestId);
-      }
-    }
-    
-    // 자동 버전 감지
-    if ((data as any).metadata?.version === "2.0") {
-      // V2 자동 감지 로깅
-      console.log(`[V2_AUTO] V2 version auto-detected at ${new Date().toISOString()}`);
-      return composeV2ReportData(data as ReportV2, requestId);
-    } else {
-      // V1으로 처리
-      return composeV1ReportData(data as ReportV1, requestId);
-    }
+    // V1으로만 처리
+    return composeV1ReportData(data as ReportV1, requestId);
   } catch (error) {
     // 검증 실패 시 기본값으로 구성
     console.error(`[COMPOSE_ERROR] Failed to compose report data:`, error);
@@ -332,7 +256,7 @@ export interface ComposeResult {
 export const safeComposeReportData = (
   data: unknown, 
   requestId: string, 
-  forceVersion?: "1" | "2"
+  forceVersion?: "1"
 ): ComposeResult => {
   try {
     const result = composeReportData(data, requestId, forceVersion);
@@ -341,7 +265,7 @@ export const safeComposeReportData = (
       success: true,
       data: result,
       version: result._render.version,
-      warnings: result._render.error ? [result._render.error] : undefined,
+      warnings: undefined,
     };
   } catch (error) {
     return {
@@ -352,26 +276,14 @@ export const safeComposeReportData = (
   }
 };
 
-// 플래그 기반 컴포지션
+// 플래그 기반 컴포지션 (V1만 지원)
 export const composeReportDataWithFlags = (
   data: unknown, 
   requestId: string, 
   projectId?: string
 ): LayoutContext => {
-  // 카나리 배포 확인 (로깅 포함)
-  const canaryDeployment = getFlagWithLogging('CANARY_DEPLOYMENT', 'composeReportDataWithFlags');
-  const canaryRatio = getFlagWithLogging('CANARY_RATIO', 'composeReportDataWithFlags');
-  const reportV2Enabled = getFlagWithLogging('REPORT_V2_ENABLED', 'composeReportDataWithFlags');
-  
-  const useV2 = reportV2Enabled && 
-    (!projectId || isInCanary(projectId, canaryRatio));
-  
-  if (useV2) {
-    console.log(`[V2_FLAG] V2 enabled via flags at ${new Date().toISOString()}`);
-    return composeReportData(data, requestId, "2");
-  } else {
-    return composeReportData(data, requestId, "1");
-  }
+  // V1으로만 처리
+  return composeReportData(data, requestId, "1");
 };
 
 // 사용량 통계 수집
@@ -379,12 +291,10 @@ export const getUsageStats = (): Record<string, any> => {
   return {
     timestamp: new Date().toISOString(),
     v1_calls: 0, // TODO: 실제 사용량 카운터 구현
-    v2_calls: 0, // TODO: 실제 사용량 카운터 구현
-    v2_migrations: 0, // TODO: 실제 사용량 카운터 구현
     flags_status: {
-      REPORT_V2_ENABLED: getFlagWithLogging('REPORT_V2_ENABLED', 'getUsageStats'),
-      CANARY_DEPLOYMENT: getFlagWithLogging('CANARY_DEPLOYMENT', 'getUsageStats'),
-      CANARY_RATIO: getFlagWithLogging('CANARY_RATIO', 'getUsageStats'),
+      REPORT_V2_ENABLED: false, // V2는 제거됨
+      CANARY_DEPLOYMENT: false, // V2는 제거됨
+      CANARY_RATIO: 0.0, // V2는 제거됨
     }
   };
 };

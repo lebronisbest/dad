@@ -13,7 +13,6 @@ export interface Flags {
   MCP_WEB_SNAPSHOT: boolean;           // 웹 스냅샷 기능
   
   // 보고서 기능 관련
-  REPORT_V2_ENABLED: boolean;          // V2 보고서 활성화
   REPORT_TEMPLATE_CACHING: boolean;    // 템플릿 캐싱
   REPORT_VALIDATION_STRICT: boolean;   // 엄격한 검증
   
@@ -22,9 +21,7 @@ export interface Flags {
   REQUEST_ID_TRACKING: boolean;        // 요청 ID 추적
   FAILURE_ARTIFACT_UPLOAD: boolean;    // 실패 시 아티팩트 업로드
   
-  // 카나리 배포 관련
-  CANARY_DEPLOYMENT: boolean;          // 카나리 배포 활성화
-  CANARY_RATIO: number;                // 카나리 비율 (0.0 ~ 1.0)
+
 }
 
 // 환경변수에서 플래그 로드
@@ -54,7 +51,6 @@ export const Flags: Flags = {
   MCP_WEB_SNAPSHOT: loadFlagFromEnv("MCP_WEB_SNAPSHOT", true),
   
   // 보고서 기능 - 기본 Off (사용량 모니터링 중)
-  REPORT_V2_ENABLED: loadFlagFromEnv("REPORT_V2_ENABLED", false),
   REPORT_TEMPLATE_CACHING: loadFlagFromEnv("REPORT_TEMPLATE_CACHING", true),
   REPORT_VALIDATION_STRICT: loadFlagFromEnv("REPORT_VALIDATION_STRICT", false),
   
@@ -63,39 +59,15 @@ export const Flags: Flags = {
   REQUEST_ID_TRACKING: loadFlagFromEnv("REQUEST_ID_TRACKING", true),
   FAILURE_ARTIFACT_UPLOAD: loadFlagFromEnv("FAILURE_ARTIFACT_UPLOAD", false),
   
-  // 카나리 배포 - 기본 Off (사용량 모니터링 중)
-  CANARY_DEPLOYMENT: loadFlagFromEnv("CANARY_DEPLOYMENT", false),
-  CANARY_RATIO: loadFlagRatioFromEnv("CANARY_RATIO", 0.0),
+
 };
 
 // 플래그 동적 업데이트 (런타임에 변경 가능)
-export const updateFlag = (key: keyof Flags, value: boolean | number): void => {
-  if (typeof value === "boolean") {
-    (Flags as any)[key] = value;
-  } else if (typeof value === "number" && key === "CANARY_RATIO") {
-    Flags.CANARY_RATIO = Math.max(0.0, Math.min(1.0, value));
-  }
+export const updateFlag = (key: keyof Flags, value: boolean): void => {
+  (Flags as any)[key] = value;
 };
 
-// 카나리 배포 확인 함수
-export const isInCanary = (bucketKey: string, ratio?: number): boolean => {
-  if (!Flags.CANARY_DEPLOYMENT) return false;
-  
-  const canaryRatio = ratio ?? Flags.CANARY_RATIO;
-  if (canaryRatio <= 0) return false;
-  if (canaryRatio >= 1) return true;
-  
-  // 간단한 해시 기반 버킷팅
-  let hash = 0;
-  for (let i = 0; i < bucketKey.length; i++) {
-    const char = bucketKey.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash; // 32bit 정수로 변환
-  }
-  
-  const normalizedHash = Math.abs(hash) % 1000;
-  return normalizedHash < (canaryRatio * 1000);
-};
+
 
 // 플래그 상태 조회
 export const getFlagsStatus = (): Record<string, any> => {
@@ -114,23 +86,16 @@ export const resetFlags = (): void => {
   Flags.MCP_NEW_LAW_SEARCH = false;
   Flags.MCP_IMAGE_PROCESSING = true;
   Flags.MCP_WEB_SNAPSHOT = true;
-  Flags.REPORT_V2_ENABLED = false;
   Flags.REPORT_TEMPLATE_CACHING = true;
   Flags.REPORT_VALIDATION_STRICT = false;
   Flags.PERFORMANCE_MONITORING = true;
   Flags.REQUEST_ID_TRACKING = true;
   Flags.FAILURE_ARTIFACT_UPLOAD = false;
-  Flags.CANARY_DEPLOYMENT = false;
-  Flags.CANARY_RATIO = 0.0;
 };
 
 // 플래그 유효성 검사
 export const validateFlags = (): string[] => {
   const errors: string[] = [];
-  
-  if (Flags.CANARY_RATIO < 0 || Flags.CANARY_RATIO > 1) {
-    errors.push("CANARY_RATIO는 0.0과 1.0 사이여야 합니다");
-  }
   
   if (Flags.NEW_PDF_PIPELINE && !Flags.PERFORMANCE_MONITORING) {
     errors.push("NEW_PDF_PIPELINE 활성화 시 PERFORMANCE_MONITORING도 활성화해야 합니다");
@@ -145,7 +110,7 @@ export const logFlagChange = (key: keyof Flags, oldValue: any, newValue: any): v
 };
 
 // 플래그 변경 시 로깅 포함
-export const setFlagWithLogging = (key: keyof Flags, value: boolean | number): void => {
+export const setFlagWithLogging = (key: keyof Flags, value: boolean): void => {
   const oldValue = (Flags as any)[key];
   updateFlag(key, value);
   logFlagChange(key, oldValue, value);

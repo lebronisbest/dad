@@ -7,12 +7,20 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 
-import { validateReportData } from "../../core/service.report.js";
 import { normalizeReportDTO } from "../../core/schema.report.js";
 
 /**
- * MCP 서버 - LLM이 필요한 기능만 제공
- * PDF 생성은 하지 않음 (API로 위임)
+ * MCP 서버 - LLM 기반 지능형 도구만 제공
+ * 
+ * 역할:
+ * - 자연어 텍스트 → 구조화된 데이터 변환
+ * - 법령 검색 및 요약
+ * - 텍스트 개선 및 리라이팅
+ * 
+ * 제외된 기능:
+ * - 데이터 검증 (HTTP API 담당)
+ * - PDF 생성 (HTTP API 담당)
+ * - 파일 저장/관리 (HTTP API 담당)
  */
 class SafetyReportMCPServer {
   constructor() {
@@ -38,7 +46,7 @@ class SafetyReportMCPServer {
         tools: [
           {
             name: "report.autofill",
-            description: "자연어 텍스트에서 보고서 DTO를 자동 생성합니다",
+            description: "자연어 텍스트를 분석하여 구조화된 보고서 DTO를 자동 생성합니다 (검증은 HTTP API에서 수행)",
             inputSchema: {
               type: "object",
               properties: {
@@ -61,7 +69,7 @@ class SafetyReportMCPServer {
           },
           {
             name: "legal.search",
-            description: "안전 관련 법령을 검색하고 요약합니다",
+            description: "안전 관련 법령을 검색하고 요약합니다 (PDF 생성은 HTTP API에서 수행)",
             inputSchema: {
               type: "object",
               properties: {
@@ -101,20 +109,7 @@ class SafetyReportMCPServer {
               required: ["text"]
             }
           },
-          {
-            name: "report.validate",
-            description: "보고서 DTO의 유효성을 검증합니다",
-            inputSchema: {
-              type: "object",
-              properties: {
-                report_data: {
-                  type: "object",
-                  description: "검증할 보고서 데이터"
-                }
-              },
-              required: ["report_data"]
-            }
-          }
+
         ]
       };
     });
@@ -134,8 +129,7 @@ class SafetyReportMCPServer {
           case "text.rewrite":
             return await this.handleTextRewrite(args);
 
-          case "report.validate":
-            return await this.handleValidate(args);
+
 
           default:
             throw new McpError(
@@ -170,7 +164,7 @@ class SafetyReportMCPServer {
         },
         {
           type: "text",
-          text: `✅ 보고서 DTO 생성 완료\n📊 추출된 필드: ${Object.keys(dto).join(', ')}`
+          text: `✅ 보고서 DTO 생성 완료\n📊 추출된 필드: ${Object.keys(dto).join(', ')}\n\n💡 다음 단계: HTTP API /v1/reports/validate로 데이터 검증 후 /v1/reports로 PDF 생성`
         }
       ]
     };
@@ -227,47 +221,7 @@ class SafetyReportMCPServer {
     };
   }
 
-  async handleValidate(args) {
-    const { report_data } = args;
 
-    const result = await validateReportData(report_data);
-
-    if (result.ok) {
-      return {
-        content: [
-          {
-            type: "json",
-            json: {
-              success: true,
-              valid: true,
-              normalized_data: result.normalizedData
-            }
-          },
-          {
-            type: "text",
-            text: "✅ 데이터 검증 성공"
-          }
-        ]
-      };
-    } else {
-      return {
-        content: [
-          {
-            type: "json",
-            json: {
-              success: false,
-              valid: false,
-              errors: result.errors
-            }
-          },
-          {
-            type: "text",
-            text: `❌ 데이터 검증 실패: ${result.errors.length}개 오류`
-          }
-        ]
-      };
-    }
-  }
 
   // 헬퍼 메소드들
   extractReportData(text, context) {

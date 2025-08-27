@@ -1,0 +1,242 @@
+---
+alwaysApply: true
+---
+# Project TT Engineering Guidelines
+
+## Description
+Do not call a router from another router (no internal fetch); always invoke domain functions directly in the order "Normalize → Validate → Render/Execute."
+
+## Globs
+- `alwaysApply: false`
+
+## Engineering Guidelines (Always-On)
+
+### Architecture & Contracts
+
+- **Single entry point**: Treat `/v1/reports` as the single source of truth. Legacy paths (`/api/...`) must be supported only by directly invoking domain functions (no redirect and no internal fetch).
+
+- **Fixed DTO pipeline**: The sequence `normalize() → validate() → execute()` must be identical in every route.
+
+- **Schema-first handling**:
+  - Validation failure → 4xx; execution failure → 5xx.
+  - Error body must be `{ ok: false, code, message, details }`.
+
+- **Version policy**: Pin `X-API-Version: v1`. For breaking changes, provide 90-day compatibility + `X-Deprecated` header + documentation updates as a bundle.
+
+### API Conventions
+
+- **HTTP semantics**: Use POST for create/execute, GET for read. For transform/preview, use the query `?output=html|pdf` only.
+
+- **Timeouts**: Server 30s; frontend fetch 15s (via AbortController). On timeout, show a user-facing message with a Retry action.
+
+- **Idempotency**: Re-sending identical payloads should yield identical results (allow hash-based caching where applicable).
+
+- **Endpoint constant**: Reference `/v1/reports` only via a constant like `API.REPORTS` (no hard-coded strings).
+
+### Frontend State Management
+
+- **Loading flags end in finally**: Always turn loading off in `finally { setLoading(false) }` for success, failure, and fallbacks.
+
+- **Complete fallback UX**: After opening a new window/alert, also close modals, clear loading, and re-enable buttons.
+
+- **Recovery actions**: Provide three default buttons — Retry / Open as HTML / View Logs.
+
+- **Actionable copy**: Error messages must clearly tell users what to do next (plain, full Korean sentences for users; keep English keys in code).
+
+### Rendering Stability (Puppeteer, etc.)
+
+- **Realistic wait conditions**: If there's no external network dependency, prefer `page.setContent(html, { waitUntil: 'load' })`. Avoid overusing `networkidle0`.
+
+- **Concurrency limits**: Gate concurrent renders with a semaphore; always release in `try/finally`.
+
+- **Resource cleanup**: Always close the browser in `finally`.
+
+- **Environment visibility**: Provide Chrome path, fonts, and locale via env vars and log them at startup.
+
+### Data Normalization & Validation
+
+- **Default skeletons**: Ensure required objects (`visit`, `site`, `org`) exist in `normalize()` before `validate()`.
+
+- **Type coercion**: Coerce numeric fields via `Number(...)`. Normalize empty strings consistently (e.g., to `null`).
+
+- **Human-readable errors**: Include field names, required formats, and examples. Messages must be safe to show directly in the UI.
+
+### Logging & Observability
+
+- **Request IDs**: Attach a `requestId` to every request/task and include it in all logs.
+
+- **Three-line rule**: Log start, key step(s), and end (levels: info → warn → error).
+
+- **User diagnostics toggle**: Provide a "Show diagnostic logs" toggle in error modals (PII stripped).
+
+### Testing & Quality
+
+- **Contract tests first**: Maintain a golden snapshot suite for `/v1/reports?output=html|pdf`. Reuse this across paths.
+
+- **Regression guard**: Add a UI test that verifies loading flags always turn off.
+
+- **Performance guard**: For a 10-page PDF, target ≤ 2s. Trigger warnings if exceeded (automated bench).
+
+- **Production smoke**: Immediately after release, generate one HTML and one PDF as a smoke test.
+
+### Operations & Release
+
+- **One-click rollback**: Always be able to revert to the previous version instantly.
+
+- **Feature flags**: Roll out new endpoints/renderers behind flags.
+
+- **Health checks**: Expose render queue size, Chrome procs, and disk space at `/healthz`.
+
+- **Error-rate alerts**: Alert when 5-minute failure rate exceeds 2%.
+
+### Security & Secrets
+
+- **No secrets in code**: Keep Chrome path, tokens, and keys in `.env`/secret manager; never log them.
+
+- **Template XSS**: Escape template variables by default; raw HTML insertion requires explicit opt-in.
+
+- **File/cache policy**: Store input/output caches under a hash directory with 24h TTL. Delete immediately if PII is present.
+
+### Git & Collaboration
+
+- **Small PRs**: Each PR should represent one clear change (e.g., endpoint unification / loading fix / render wait).
+
+- **PR template**: Background → Changes → Screenshots/Logs → Tests → Rollback Plan → Release Notes.
+
+- **Commit style**: `feat|fix|refactor(scope): summary` with an issue reference.
+
+## Prohibited (Domino-Preventers)
+
+- Router → router internal fetch is forbidden.
+- Do not call render/execute without validation.
+- No resource or state handling without `finally`.
+- No hard-coded endpoints (must use constants).
+- No self-calls via external URLs from inside the server.
+
+## Definition of Done (Checklist)
+
+- [ ] Frontend calls only `API.REPORTS = '/v1/reports'`.
+- [ ] Loading is always cleared in `finally` (UI test passes), including fallbacks.
+- [ ] `normalize()` guarantees default structures for `visit`/`site`/`org`.
+- [ ] Puppeteer uses `waitUntil: 'load'`, enforces concurrency limits, and closes in `finally`.
+- [ ] Contract & smoke tests pass; performance target met (10p ≤ 2s).
+- [ ] Release includes notes and a rollback plan.# Project TT Engineering Guidelines
+
+## Description
+Do not call a router from another router (no internal fetch); always invoke domain functions directly in the order "Normalize → Validate → Render/Execute."
+
+## Globs
+- `alwaysApply: false`
+
+## Engineering Guidelines (Always-On)
+
+### Architecture & Contracts
+
+- **Single entry point**: Treat `/v1/reports` as the single source of truth. Legacy paths (`/api/...`) must be supported only by directly invoking domain functions (no redirect and no internal fetch).
+
+- **Fixed DTO pipeline**: The sequence `normalize() → validate() → execute()` must be identical in every route.
+
+- **Schema-first handling**:
+  - Validation failure → 4xx; execution failure → 5xx.
+  - Error body must be `{ ok: false, code, message, details }`.
+
+- **Version policy**: Pin `X-API-Version: v1`. For breaking changes, provide 90-day compatibility + `X-Deprecated` header + documentation updates as a bundle.
+
+### API Conventions
+
+- **HTTP semantics**: Use POST for create/execute, GET for read. For transform/preview, use the query `?output=html|pdf` only.
+
+- **Timeouts**: Server 30s; frontend fetch 15s (via AbortController). On timeout, show a user-facing message with a Retry action.
+
+- **Idempotency**: Re-sending identical payloads should yield identical results (allow hash-based caching where applicable).
+
+- **Endpoint constant**: Reference `/v1/reports` only via a constant like `API.REPORTS` (no hard-coded strings).
+
+### Frontend State Management
+
+- **Loading flags end in finally**: Always turn loading off in `finally { setLoading(false) }` for success, failure, and fallbacks.
+
+- **Complete fallback UX**: After opening a new window/alert, also close modals, clear loading, and re-enable buttons.
+
+- **Recovery actions**: Provide three default buttons — Retry / Open as HTML / View Logs.
+
+- **Actionable copy**: Error messages must clearly tell users what to do next (plain, full Korean sentences for users; keep English keys in code).
+
+### Rendering Stability (Puppeteer, etc.)
+
+- **Realistic wait conditions**: If there's no external network dependency, prefer `page.setContent(html, { waitUntil: 'load' })`. Avoid overusing `networkidle0`.
+
+- **Concurrency limits**: Gate concurrent renders with a semaphore; always release in `try/finally`.
+
+- **Resource cleanup**: Always close the browser in `finally`.
+
+- **Environment visibility**: Provide Chrome path, fonts, and locale via env vars and log them at startup.
+
+### Data Normalization & Validation
+
+- **Default skeletons**: Ensure required objects (`visit`, `site`, `org`) exist in `normalize()` before `validate()`.
+
+- **Type coercion**: Coerce numeric fields via `Number(...)`. Normalize empty strings consistently (e.g., to `null`).
+
+- **Human-readable errors**: Include field names, required formats, and examples. Messages must be safe to show directly in the UI.
+
+### Logging & Observability
+
+- **Request IDs**: Attach a `requestId` to every request/task and include it in all logs.
+
+- **Three-line rule**: Log start, key step(s), and end (levels: info → warn → error).
+
+- **User diagnostics toggle**: Provide a "Show diagnostic logs" toggle in error modals (PII stripped).
+
+### Testing & Quality
+
+- **Contract tests first**: Maintain a golden snapshot suite for `/v1/reports?output=html|pdf`. Reuse this across paths.
+
+- **Regression guard**: Add a UI test that verifies loading flags always turn off.
+
+- **Performance guard**: For a 10-page PDF, target ≤ 2s. Trigger warnings if exceeded (automated bench).
+
+- **Production smoke**: Immediately after release, generate one HTML and one PDF as a smoke test.
+
+### Operations & Release
+
+- **One-click rollback**: Always be able to revert to the previous version instantly.
+
+- **Feature flags**: Roll out new endpoints/renderers behind flags.
+
+- **Health checks**: Expose render queue size, Chrome procs, and disk space at `/healthz`.
+
+- **Error-rate alerts**: Alert when 5-minute failure rate exceeds 2%.
+
+### Security & Secrets
+
+- **No secrets in code**: Keep Chrome path, tokens, and keys in `.env`/secret manager; never log them.
+
+- **Template XSS**: Escape template variables by default; raw HTML insertion requires explicit opt-in.
+
+- **File/cache policy**: Store input/output caches under a hash directory with 24h TTL. Delete immediately if PII is present.
+
+### Git & Collaboration
+
+- **Small PRs**: Each PR should represent one clear change (e.g., endpoint unification / loading fix / render wait).
+
+- **PR template**: Background → Changes → Screenshots/Logs → Tests → Rollback Plan → Release Notes.
+
+- **Commit style**: `feat|fix|refactor(scope): summary` with an issue reference.
+
+## Prohibited (Domino-Preventers)
+
+- Router → router internal fetch is forbidden.
+- Do not call render/execute without validation.
+- No resource or state handling without `finally`.
+- No hard-coded endpoints (must use constants).
+- No self-calls via external URLs from inside the server.
+
+## Definition of Done (Checklist)
+
+- [ ] Frontend calls only `API.REPORTS = '/v1/reports'`.
+- [ ] Loading is always cleared in `finally` (UI test passes), including fallbacks.
+- [ ] `normalize()` guarantees default structures for `visit`/`site`/`org`.
+- [ ] Puppeteer uses `waitUntil: 'load'`, enforces concurrency limits, and closes in `finally`.
+- [ ] Contract & smoke tests pass; performance target met (10p ≤ 2s).
+- [ ] Release includes notes and a rollback plan.

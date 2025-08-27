@@ -43,9 +43,6 @@
       "is_electrical": "boolean"
     },
     "guide": {
-      "org_name": "string",
-      "inspector": "string",
-      "phone": "string",
       "previous_completed": "boolean",
       "previous_incomplete": "boolean"
     },
@@ -150,7 +147,6 @@
     "site.name",
     "site.address",
     "org.name",
-    "org.inspector",
     "visit.date",
     "visit.round",
     "visit.round_total"
