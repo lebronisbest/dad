@@ -26,22 +26,18 @@ class DateFormatter {
   }
 
   /**
-   * 한국 형식을 ISO 형식으로 변환
-   * @param {string} koreanDate - YY.MM.DD(요일) 형식
-   * @returns {string} ISO 형식 (YYYY-MM-DD)
+   * 한국 형식(YY.MM.DD)을 ISO 형식으로 변환
+   * @param {string} koreanDate - YY.MM.DD 형식 (예: '24.05.01')
+   * @returns {string} ISO 형식 (YYYY-MM-DD). 유효하지 않으면 빈 문자열 반환
    */
   static fromKoreanFormat(koreanDate) {
     if (!koreanDate) return '';
-    
+
     try {
-      // YY.MM.DD 형식에서 YYYY-MM-DD로 변환
-      const match = koreanDate.match(/^(\d{2})\.(\d{2})\.(\d{2})/);
-      if (!match) return '';
-      
-      const [, year, month, day] = match;
-      const fullYear = parseInt(year) < 50 ? `20${year}` : `19${year}`;
-      
-      return `${fullYear}-${month}-${day}`;
+      const dayjsDate = dayjs(koreanDate, 'YY.MM.DD', true);
+      if (!dayjsDate.isValid()) return '';
+
+      return dayjsDate.format('YYYY-MM-DD');
     } catch (error) {
       console.error('한국 날짜 형식 변환 오류:', error);
       return '';
